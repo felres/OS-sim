@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdio.h>
 
 /* MACROS */
 #define SIZE 100
@@ -48,7 +49,9 @@ static int err(int n)
 }
 static int err(std::string str, int n)
 {
+    std::cerr << RESET << RED;
     std::cerr << "ERROR(" << n << "): " << str << "\n";
+    std::cerr << RESET;
     return n;
 }
 
@@ -63,6 +66,13 @@ static std::string chToStr(char ch)
     std::string str = "";
     str.push_back(ch);
     return str;
+}
+
+static bool strToBool(std::string str)
+{
+    if( (str.length()>0) && (toupper(str[0])=='T') )
+        return true;
+    return false;
 }
 
 #endif
