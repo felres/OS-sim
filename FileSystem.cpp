@@ -5,15 +5,15 @@
 /// PRIVATE METHODS
 /// ******************************************
 
-int FileSystem::encontrarBloqueVacio()
+int FileSystem::getAvailableBlock()
 {
-	if(entregaAleatoria)
-		return encontrarBloqueVacioAleatorio();
+	if(randomizedBlockSearching)
+		return getAvailableBlockRandom();
 	else
-		return encontrarBloqueVacioSecuencial();
+		return getAvailableBlockSequential();
 };
 
-int FileSystem::encontrarBloqueVacioSecuencial()
+int FileSystem::getAvailableBlockSequential()
 {
 	for(int i = 0; i < SIZE; i++) {
 		if(fat[i] == -1)
@@ -22,57 +22,57 @@ int FileSystem::encontrarBloqueVacioSecuencial()
 	return err("Memoria llena!", -1);
 };
 
-int FileSystem::encontrarBloqueVacioAleatorio()
+int FileSystem::getAvailableBlockRandom()
 {
 	int i;
-	int intentos = 150;
+	int tries = 150;
 	do {
 		i = random(0, SIZE);
-		intentos--;
-		if(intentos < 0) return encontrarBloqueVacioSecuencial();
+		tries--;
+		if(tries < 0) return getAvailableBlockSequential();
 	} while(fat[i] != -1);
 	return i;
 };
 
-int FileSystem::encontrarUltimoFAT(int bloqueInicial)
+int FileSystem::getLastBlockInChainFrom(int blockIndex)
 {
-	if( fat[bloqueInicial] == bloqueInicial )
-		return bloqueInicial;
-	return encontrarUltimoFAT( fat[bloqueInicial] );
+	if( fat[blockIndex] == blockIndex )
+		return blockIndex;
+	return getLastBlockInChainFrom( fat[blockIndex] );
 };
 
-int FileSystem::encontrarIndiceFAT(int bloqueInicial, int indice, int count)
+int FileSystem::getBlockInChainAtIndex(int blockIndex, int index, int count)
 {
-	if( count == indice ) {
-		return bloqueInicial;
+	if( count == index ) {
+		return blockIndex;
 	}
-	return encontrarIndiceFAT( fat[bloqueInicial], indice, count+1);
+	return getBlockInChainAtIndex( fat[blockIndex], index, count+1);
 };
 
-std::string FileSystem::stringDesde(int bloqueInicial)
+std::string FileSystem::getStringFrom(int blockIndex)
 {
-	if(bloqueInicial == -1) return "";
+	if(blockIndex == -1) return "";
 	strtemp.clear();
-	stringDesdeRecursivo(bloqueInicial);
+	getStringFromRecursive(blockIndex);
 	return strtemp;
 };
 
-int FileSystem::stringDesdeRecursivo(int bloque)
+int FileSystem::getStringFromRecursive(int blockIndex)
 {
-	strtemp += unidadDeMemoria[bloque];
-	if( fat[bloque] == bloque )
-		return bloque;
-	return stringDesdeRecursivo( fat[bloque] );
+	strtemp += unidadDeMemoria[blockIndex];
+	if( fat[blockIndex] == blockIndex )
+		return blockIndex;
+	return getStringFromRecursive( fat[blockIndex] );
 };
 
-int FileSystem::eliminarRecursivo(int bloque)
+int FileSystem::removeFileRecursive(int blockIndex)
 {
-	int temp = fat[bloque];
-	fat[bloque] = -1;
-	if(seguro) unidadDeMemoria[bloque] = ' ';
-	if( temp == bloque )
-		return bloque;
-	return eliminarRecursivo( temp );
+	int temp = fat[blockIndex];
+	fat[blockIndex] = -1;
+	if(secureDeletion) unidadDeMemoria[blockIndex] = ' ';
+	if( temp == blockIndex )
+		return blockIndex;
+	return removeFileRecursive( temp );
 };
 
 int FileSystem::getUserIndex(std::string name)
@@ -80,7 +80,7 @@ int FileSystem::getUserIndex(std::string name)
     int index = -1;
 	for(int i = 0; i < userCount; i++)
 	{
-		if(name.compare(users[i].nombre) == 0)
+		if(name.compare(users[i].name) == 0)
 		{
 			index = i;
 			break;
@@ -94,7 +94,7 @@ int FileSystem::getGroupIndex(std::string name)
     int index = -1;
 	for(int i = 0; i < groupCount; i++)
 	{
-		if(name.compare(groups[i].nombre) == 0)
+		if(name.compare(groups[i].name) == 0)
 		{
 			index = i;
 			break;
@@ -103,13 +103,13 @@ int FileSystem::getGroupIndex(std::string name)
 	return index;
 };
 
-int FileSystem::getEntryIndex(std::string name)
+int FileSystem::getFileIndex(std::string name)
 {
 	int entryIndex = -1;
 	// buscar el nombre en la base de datos (entradas)
-	for(int i = 0; i < entradasTotales; i++)
+	for(int i = 0; i < directorio.size(); i++)
 	{
-		if(name.compare(directorio[i].nombre) == 0)
+		if(name.compare(directorio[i].name) == 0)
 		{
 			entryIndex = i;
 			break;
@@ -124,7 +124,7 @@ std::string FileSystem::getUserNameWithId(int userId)
 	{
 		if(users[i].id == userId)
 		{
-			return users[i].nombre;
+			return users[i].name;
 		}
 	}
 	return "ERROR??";
@@ -132,12 +132,12 @@ std::string FileSystem::getUserNameWithId(int userId)
 
 std::string FileSystem::getUserNameAt(int index)
 {
-    return users[index].nombre;
+    return users[index].name;
 };
 
 std::string FileSystem::getGroupNameAt(int index)
 {
-    return groups[index].nombre;
+    return groups[index].name;
 };
 
 Group FileSystem::getGroupWithId(int groupId)
@@ -153,7 +153,7 @@ Group FileSystem::getGroupWithId(int groupId)
 
 bool FileSystem::canCurrentUserModifyFile(std::string filename)
 {
-    int fileId = getEntryIndex(filename);
+    int fileId = getFileIndex(filename);
     File fileInfo = directorio[fileId];
     if(currentUserIndex==0) return true; //root
     if(fileInfo.publicCanWrite) return true;
@@ -177,7 +177,7 @@ bool FileSystem::canCurrentUserModifyFile(std::string filename)
 
 bool FileSystem::canCurrentUserReadFile(std::string filename)
 {
-    int fileId = getEntryIndex(filename);
+    int fileId = getFileIndex(filename);
     File fileInfo = directorio[fileId];
     if(currentUserIndex==0) return true; //root
     if(fileInfo.publicCanRead) return true;
@@ -245,25 +245,23 @@ int FileSystem::createGroup(std::string name)
 	if(groupIndex!=-1) return err("Ya existe grupo " + name, 2);
 
     groups[groupCount].id = groupCount;
-    groups[groupCount].nombre = name;
+    groups[groupCount].name = name;
     groups[groupCount].memberCount = 0;
     
     groupCount++;
     return 0;
 };
 
-int FileSystem::crear(std::string nombre)
+int FileSystem::createFile(std::string name)
 {
-	//std::cerr << "crear: " << nombre << "\n";
 	if(directorio.size()>=SIZE)
-		return err("Sin espacio para: " + (std::string)nombre, 1);
-	int entryIndex = getEntryIndex(nombre);
-	if(entryIndex!=-1) return err("Ya existe file " + nombre, 2);
+		return err("Sin espacio para: " + (std::string)name, 1);
+	int entryIndex = getFileIndex(name);
+	if(entryIndex!=-1) return err("Ya existe file " + name, 2);
     if(currentUserIndex == -1) return err("No user selected.", 3);
     directorio.resize(directorio.size()+1);
-	directorio[directorio.size()-1].nombre = nombre;
-	// el -1 aqui sifnifica que no tiene un bloque asignado
-	directorio[directorio.size()-1].bloqueInicial = -1;
+	directorio[directorio.size()-1].name = name;
+	directorio[directorio.size()-1].bloqueInicial = -1; //-1: no block assigned
 	directorio[directorio.size()-1].fechaCreacion = std::time(nullptr);
     // permission stuff
     directorio[directorio.size()-1].ownerId = currentUserIndex;
@@ -287,7 +285,7 @@ void FileSystem::printFiles()
     std::cout << RESET << BOLD;
 	std::cout << "    Flags|   Owner|   Group|Size|        Date|    Name" << "\n";
 	std::cout << RESET;
-	for(int i = 0; i < entradasTotales; i++)
+	for(int i = 0; i < directorio.size(); i++)
 	{
 		File entrada = directorio[i];
         std::string flags;
@@ -303,10 +301,10 @@ void FileSystem::printFiles()
         std::cout << flags << "|";
 		std::cout << std::setw(8) << getUserNameAt(entrada.ownerId) << "|";
         std::cout << std::setw(8) << getGroupNameAt(entrada.groupId) << "|";
-        std::string contents = stringDesde(entrada.bloqueInicial);
+        std::string contents = getStringFrom(entrada.bloqueInicial);
 		std::cout << std::setw(4) << contents.length() << "|";
         std::cout << std::setw(12) << entrada.fechaCreacion << "|";
-        std::cout << std::setw(8) << entrada.nombre;
+        std::cout << std::setw(8) << entrada.name;
 		std::cout << "\n";
 	}
 	std::cout << "\n";
@@ -321,7 +319,7 @@ void FileSystem::printUsers()
 	for(int i = 0; i < userCount; i++)
 	{
         std::cout << std::setw(3) << users[i].id << "|";
-        std::cout << std::setw(8) << users[i].nombre << "|";
+        std::cout << std::setw(8) << users[i].name << "|";
         std::cout << std::setw(16) << users[i].password << "|";
         std::cout << std::setw(14)
             << getGroupNameAt(users[i].primaryGroupId);
@@ -339,7 +337,7 @@ void FileSystem::printGroups()
 	for(int i = 0; i < groupCount; i++)
 	{
         std::cout << std::setw(3) << groups[i].id << "|";
-        std::cout << std::setw(8) << groups[i].nombre << "|";
+        std::cout << std::setw(8) << groups[i].name << "|";
         // primary members
         int arr[SIZE];
         int arrlen = getPrimaryMemberIdsInGroup(groups[i].id, arr);
@@ -385,7 +383,7 @@ int FileSystem::createUser(std::string name, std::string groupName, std::string 
     if(groupIndex==-1) return err("No existe grupo " + groupName, 3);
         
     users[userCount].id = userCount;
-    users[userCount].nombre = name;
+    users[userCount].name = name;
     users[userCount].password = password;
     users[userCount].primaryGroupId = groupIndex;
     
@@ -399,7 +397,7 @@ int FileSystem::createUser(std::string name, std::string groupName, std::string 
 
 int FileSystem::changemode(std::string filename, int flagindex, bool b)
 {
-    int entryIndex = getEntryIndex(filename);
+    int entryIndex = getFileIndex(filename);
 	if(entryIndex==-1) return err("File "+filename+" does not exist.", 1);
     if(!canCurrentUserModifyFile(filename))
         return err("User cannot modify " + filename, 2);
@@ -425,28 +423,28 @@ int FileSystem::changemode(std::string filename, int flagindex, bool b)
 int FileSystem::readFile(std::string filename)
 {
     if(currentUserIndex == -1) return err("No user selected.", 1);
-    int entryIndex = getEntryIndex(filename);
+    int entryIndex = getFileIndex(filename);
     if(entryIndex==-1) return err("File " + filename + " does not exist.", 2);
     if(!canCurrentUserReadFile(filename))
         return err("User cannot read " + filename, 3);
 
     std::cout << "\""
-                << stringDesde(directorio[entryIndex].bloqueInicial)
+                << getStringFrom(directorio[entryIndex].bloqueInicial)
                 << "\"\n";
     
     return 0;
 };
 
-int FileSystem::escribir(std::string nombre, int index, char caracter)
+int FileSystem::writeInFileAt(std::string name, int index, char caracter)
 {
-	int entryIndex = getEntryIndex(nombre);
-	if(entryIndex==-1) return err("No existe "+nombre+". Abortando escritura de "+chToStr(caracter)+".", 1);
-	std::string str = stringDesde(directorio[entryIndex].bloqueInicial);
+	int entryIndex = getFileIndex(name);
+	if(entryIndex==-1) return err("No existe "+name+". Abortando escritura de "+chToStr(caracter)+".", 1);
+	std::string str = getStringFrom(directorio[entryIndex].bloqueInicial);
 	if(index>=str.length()) return err("out of bounds", 2);
-    if(!canCurrentUserModifyFile(nombre))
-        return err("User cannot modify " + nombre, 3);
+    if(!canCurrentUserModifyFile(name))
+        return err("User cannot modify " + name, 3);
         
-	int indexEnMemoria = encontrarIndiceFAT(
+	int indexEnMemoria = getBlockInChainAtIndex(
 							directorio[entryIndex].bloqueInicial,
 							index, 0);
 
@@ -455,21 +453,21 @@ int FileSystem::escribir(std::string nombre, int index, char caracter)
 	return 0;
 };
 
-int FileSystem::agregar(std::string nombre, char caracter)
+int FileSystem::appendToFile(std::string name, char caracter)
 {
-	int entryIndex = getEntryIndex(nombre);
+	int entryIndex = getFileIndex(name);
 	if(entryIndex==-1)
 		return err("No existe "+
-					nombre+". Abortando intento de agregar "
+					name+". Abortando intento de agregar "
 					+chToStr(caracter)+".", 1);
 	// index del bloque nuevo
-	int bloque = encontrarBloqueVacio();
+	int bloque = getAvailableBlock();
 	if(bloque==-1)
 		return err("Sin espacio para char: "+chToStr(caracter),2);
-    if(!canCurrentUserModifyFile(nombre))
-        return err("User cannot modify " + nombre, 3);
+    if(!canCurrentUserModifyFile(name))
+        return err("User cannot modify " + name, 3);
     
-	// Asignando un nombre al entry por primera vez?
+	// Asignando un name al entry por primera vez?
 	if(directorio[entryIndex].bloqueInicial == -1)
 	{
 		directorio[entryIndex].bloqueInicial = bloque;
@@ -479,7 +477,7 @@ int FileSystem::agregar(std::string nombre, char caracter)
 		// Modificar el penultimo FAT.
 		// para que apunte al bloque nuevo.
 		int ini = directorio[entryIndex].bloqueInicial;
-		int penultimo = encontrarUltimoFAT(ini);
+		int penultimo = getLastBlockInChainFrom(ini);
 		fat[penultimo] = bloque;
 	}
 	// Apuntamos FAT del bloque a si mismo (para que sea el ultimo)
@@ -490,10 +488,10 @@ int FileSystem::agregar(std::string nombre, char caracter)
 	return 0;
 };
 
-int FileSystem::agregar(std::string nombre, std::string str)
+int FileSystem::appendToFile(std::string name, std::string str)
 {
     for(int i = 0; i < str.length(); i++) {
-        if(agregar(nombre, (char)str[i])!= 0)
+        if(appendToFile(name, (char)str[i])!= 0)
         {
             return err("Failed to add char.", 1);
             break;
@@ -502,17 +500,17 @@ int FileSystem::agregar(std::string nombre, std::string str)
 	return 0;
 };
 
-int FileSystem::eliminar(std::string nombre, bool seguro)
+int FileSystem::removeFile(std::string name, bool seguro)
 {
-	int entryIndex = getEntryIndex(nombre);
-	if(entryIndex==-1) return err("No existe " + nombre, 1);
+	int entryIndex = getFileIndex(name);
+	if(entryIndex==-1) return err("No existe " + name, 1);
 
-    if(!canCurrentUserModifyFile(nombre))
-        return err("User cannot modify " + nombre, 3);
+    if(!canCurrentUserModifyFile(name))
+        return err("User cannot modify " + name, 3);
     
 	// Eliminar del FAT
-	this->seguro = seguro;
-	eliminarRecursivo(directorio[entryIndex].bloqueInicial);
+	this->secureDeletion = seguro;
+	removeFileRecursive(directorio[entryIndex].bloqueInicial);
 
 	// Eliminar de directorio
 	directorio.erase(directorio.begin()+ entryIndex);
@@ -527,7 +525,7 @@ int FileSystem::eliminar(std::string nombre, bool seguro)
 
 void FileSystem::usarAsignacionAleatoria(bool usar)
 {
-	entregaAleatoria = usar;
+	randomizedBlockSearching = usar;
 };
 
 void FileSystem::imprimirStrings()
@@ -535,11 +533,11 @@ void FileSystem::imprimirStrings()
 	std::cout << RESET << BOLD << UNDERLINE;
 	std::cout << "Strings:" << "\n";
 	std::cout << RESET;
-	for(int i = 0; i < entradasTotales; i++)
+	for(int i = 0; i < directorio.size(); i++)
 	{
 		File entrada = directorio[i];
-		std::cout << entrada.nombre << ": ";
-		std::cout << stringDesde(entrada.bloqueInicial);
+		std::cout << entrada.name << ": ";
+		std::cout << getStringFrom(entrada.bloqueInicial);
 		std::cout << "\n";
 	}
 	std::cout << "\n";
@@ -555,12 +553,12 @@ void FileSystem::imprimirDirectorio()
 	for(int i = 0; i < directorio.size(); i++)
 	{
 		std::cout << std::setw(7) << i << "|";
-		std::cout << std::setw(10) << directorio[i].nombre << "|";
+		std::cout << std::setw(10) << directorio[i].name << "|";
 		int ini = directorio[i].bloqueInicial;
 		std::string inistr = std::to_string(ini);
 		if(ini==-1) inistr += " (n/a)";
 		std::cout << std::setw(15) << inistr << "|";
-        std::cout << " " << stringDesde(directorio[i].bloqueInicial);
+        std::cout << " " << getStringFrom(directorio[i].bloqueInicial);
 		std::cout << "\n";
 	}
 	std::cout << "\n";
@@ -621,19 +619,19 @@ int FileSystem::loadTest()
     createGroup("students");
     createUser("alice", "students", "");
     switchUser("alice");
-    crear("a.txt");
-    agregar("a.txt", "ants!");
+    createFile("a.txt");
+    appendToFile("a.txt", "ants!");
     createUser("bob", "students", "");
     switchUser("bob");
-    crear("b.txt");
-    agregar("b.txt", "birds!");
+    createFile("b.txt");
+    appendToFile("b.txt", "birds!");
     createGroup("teachers");
     createUser("carol", "teachers", "");
     switchUser("carol");
-    crear("c.txt");
-    agregar("c.txt", "cats!");
-    crear("board.txt");
-    agregar("board.txt", "dsjkfhakls");
+    createFile("c.txt");
+    appendToFile("c.txt", "cats!");
+    createFile("board.txt");
+    appendToFile("board.txt", "dsjkfhakls");
     changemode("board.txt", 0, true);
     changemode("board.txt", 1, true);
     changemode("board.txt", 2, true);
@@ -646,7 +644,7 @@ int FileSystem::loadTest()
     createGroup("guests");
     createUser("dave", "guests", "");
     switchUser("dave");
-    crear("d.txt");
-    agregar("d.txt", "dragons!");
+    createFile("d.txt");
+    appendToFile("d.txt", "dragons!");
     return 0;
 };

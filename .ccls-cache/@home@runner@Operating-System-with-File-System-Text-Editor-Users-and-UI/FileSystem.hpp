@@ -7,7 +7,7 @@
 
 /// File entry struct
 struct File{
-    std::string nombre;
+    std::string name;
     int bloqueInicial;    
     time_t fechaCreacion;
 
@@ -29,14 +29,14 @@ struct File{
 
 struct User{
     int id;
-    std::string nombre;
+    std::string name;
     std::string password;
     int primaryGroupId;
 };
 
 struct Group{
     int id;    
-    std::string nombre;
+    std::string name;
     int memberIdList[SIZE];
     int memberCount;
 };
@@ -46,7 +46,7 @@ class FileSystem{
 private:
     /// Vector that contains all files
     std::vector<File> directorio;
-    int entradasTotales = 0; // num de archivos
+    int entradasTotales = 0; // should not exist
 
     /// Vector that acts as File Allocation System (FAT).
     /// -1 means data block is available.
@@ -55,14 +55,14 @@ private:
     /// Memory unit, that acts as real storage.
     std::vector<char> unidadDeMemoria;
 
-    /// Wether assign fat blocks in order or not.
-    bool entregaAleatoria = false;
+    /// Whether look for FAT blocks in order or not.
+    bool randomizedBlockSearching = false;
     
     /// Used as temporary global variable for some recursive methods.
     std::string strtemp;
 
-    /// I dont remember
-    bool seguro = false;
+    /// When deleting, memory will be set to blank too
+    bool secureDeletion = false;
 
     /// Current user logged in the interface.
     /// -1: No user.
@@ -78,44 +78,49 @@ private:
     int userCount = 0;
 
     /**
-     * Description.
+     * Can either search for a block randomly or sequentially.
      * 
+     * @return Index of available memory block. -1 if full.
+     */
+	int getAvailableBlock();
+
+    /**
+     * Searches for the earliest available block in memory.
+     * Counts from block 0.
+     * 
+     * @return Index of available memory block. -1 if full.
+     */
+    int getAvailableBlockSequential();
+
+    /**
+     * Searches for a random block in memory.
+     * Has a limited number of tries, and if depleted uses sequential.
+     * 
+     * @return Index of available memory block. -1 if full.
+     */
+    int getAvailableBlockRandom();
+
+    /**
+     * Recursively search through FAT references until
+     * it finds the index that references itself.
+     * Meaning it searches for the last index in the allocation block sequence.
+     * Its useful for finding the block where a string ends. 
+     *
      * @param
      * @return
      */
-	int encontrarBloqueVacio();
+    int getLastBlockInChainFrom(int block);
 
     /**
      * Description.
+     * Should always be called with count=0 for the first time.
      * 
-     * @param
+     * @param blockIndex Index in FAT to start from.
+     * @param index Index we need.
+     * @param count Internal count to get to index.
      * @return
      */
-    int encontrarBloqueVacioSecuencial();
-
-    /**
-     * Description.
-     * 
-     * @param
-     * @return
-     */
-    int encontrarBloqueVacioAleatorio();
-
-    /**
-     * Description.
-     * 
-     * @param
-     * @return
-     */
-    int encontrarUltimoFAT(int bloqueInicial);
-
-    /**
-     * Description.
-     * 
-     * @param
-     * @return
-     */
-    int encontrarIndiceFAT(int bloqueInicial, int indice, int count);
+    int getBlockInChainAtIndex(int blockIndex, int index, int count);
     
     /**
      * Description.
@@ -123,7 +128,7 @@ private:
      * @param
      * @return
      */
-    std::string stringDesde(int bloqueInicial);
+    std::string getStringFrom(int bloqueInicial);
 
     /**
      * Description.
@@ -131,7 +136,7 @@ private:
      * @param
      * @return
      */
-    int stringDesdeRecursivo(int bloque);
+    int getStringFromRecursive(int bloque);
 
     /**
      * Description.
@@ -139,7 +144,7 @@ private:
      * @param
      * @return
      */
-    int eliminarRecursivo(int bloque);
+    int removeFileRecursive(int bloque);
 
     /**
      * Description.
@@ -147,7 +152,7 @@ private:
      * @param
      * @return
      */
-    int getEntryIndex(std::string name);
+    int getFileIndex(std::string name);
 
     /**
      * Description.
@@ -259,15 +264,21 @@ public:
      */
     void usarAsignacionAleatoria(bool usar);
 
-    /* retorna 0 si todo bien
-     * si no, hubo problema
+    /**
+     * Description.
+     * 
+     * @param
+     * @return
      */
-    int crear(std::string nombre);
+    int createFile(std::string name);
 
-    /* retorna 0 si todo bien
-     * si no, hubo problema
+    /**
+     * Description.
+     * 
+     * @param
+     * @return
      */
-    int escribir(std::string nombre, int index, char caracter);
+    int writeInFileAt(std::string name, int index, char caracter);
 
     /**
      * Description.
@@ -277,10 +288,13 @@ public:
      */
     int readFile(std::string filename);
     
-	/* retorna 0 si todo bien
-     * si no, hubo problema
+	/**
+     * Description.
+     * 
+     * @param
+     * @return
      */
-    int agregar(std::string nombre, char caracter);    
+    int appendToFile(std::string name, char caracter); 
 
     /**
      * Description.
@@ -288,7 +302,15 @@ public:
      * @param
      * @return
      */
-    int eliminar(std::string nombre, bool seguro);
+    int appendToFile(std::string name, std::string str);
+
+    /**
+     * Description.
+     * 
+     * @param
+     * @return
+     */
+    int removeFile(std::string name, bool seguro);
 
     /**
      * Description.
@@ -298,10 +320,7 @@ public:
      */
     int changemode(std::string filename, int flagindex, bool b);
     
-	/* retorna 0 si todo bien
-     * si no, hubo problema
-     */
-    int agregar(std::string nombre, std::string str);
+	
 
     /**
      * Description.

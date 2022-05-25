@@ -1,3 +1,9 @@
+/* *****************************************************************************
+ * 
+ * General purpose helper script.
+ * 
+ */
+
 #ifndef HELPERS_CPP
 #define HELPERS_CPP
 
@@ -70,6 +76,14 @@ static int err(std::string str, int n)
     return n;
 }
 
+/**
+ * Makes rand() give different results each file execution.
+ **/
+static void randomize()
+{
+    // random seed
+    srand( time(NULL) );
+}
 
 /**
  * Generates a random int in the range [min, max] (inclusive).
@@ -80,9 +94,10 @@ static int err(std::string str, int n)
  * @param max maximun number to pick from inclusive.
  * @return random int.
  **/
-static int random(int min, int max) //range : [min, max]
+static int random(int min, int max)
 {
-   return min + std::rand() % (( max + 1 ) - min);
+    //range : [min, max]
+    return min + std::rand() % (( max + 1 ) - min);
 }
 
 /**
