@@ -8,10 +8,12 @@
 /* MACROS */
 #define SIZE 100
 
-/* COLORES ANSI 
+/**
+ * ANSI COLORS
+ * Sourced from:
  * https://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
  * https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
-*/
+ */
 // general
 #define RESET               "\033[0m"
 #define BOLD                "\u001b[1m"
@@ -37,16 +39,29 @@
 #define BACK_CYAN           "\u001b[46m"
 #define BACK_WHITE          "\u001b[47m"
 
-/* FUNCIONES */
+/* FUNCTIONS */
 
-/*
- * Manejo de errores.
- */
+/**
+ * Error Handling. Prints error num to cerr.
+ *
+ * @param error number.
+ * @return error number.
+ **/
 static int err(int n)
 {
+    std::cerr << RESET << RED;
     std::cerr << "ERROR(" << n << ")!\n";
+    std::cerr << RESET;
     return n;
 }
+
+/**
+ * Error Handling. Prints error num and message to cerr.
+ *
+ * @param error message.
+ * @param error number.
+ * @return error number.
+ **/
 static int err(std::string str, int n)
 {
     std::cerr << RESET << RED;
@@ -55,12 +70,27 @@ static int err(std::string str, int n)
     return n;
 }
 
-// https://stackoverflow.com/questions/7560114/random-number-c-in-some-range
+
+/**
+ * Generates a random int in the range [min, max] (inclusive).
+ * Lineal distribution.
+ * Sourced from: https://stackoverflow.com/q/7560114
+ *
+ * @param min minimum number to pick from inclusive.
+ * @param max maximun number to pick from inclusive.
+ * @return random int.
+ **/
 static int random(int min, int max) //range : [min, max]
 {
    return min + std::rand() % (( max + 1 ) - min);
 }
 
+/**
+ * Transform char into c++ string.
+ *
+ * @param ch char to tranform.
+ * @return c++ string.
+ **/
 static std::string chToStr(char ch)
 {
     std::string str = "";
@@ -68,6 +98,12 @@ static std::string chToStr(char ch)
     return str;
 }
 
+/**
+ * Interprets a c++ string into a bool value.
+ *
+ * @param str string to interpret.
+ * @return true if first char is a 'T' or 't'. False otherwise.
+ **/
 static bool strToBool(std::string str)
 {
     if( (str.length()>0) && (toupper(str[0])=='T') )

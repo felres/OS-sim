@@ -9,7 +9,14 @@ private:
 public:
 	Interface(){}
 	~Interface(){}
-	int run(FileSystem* fs){
+
+    /**
+     * Read user input from cout. 
+     * 
+     * @param FileSystem object to send user requests to.
+     * @return 0 if ok.
+     */	
+    int run(FileSystem* fs){
 		while(true)
 	    {
 	        std::cout << RESET << BOLD << GREEN;
@@ -21,7 +28,14 @@ public:
 	    }
 		return 0;
 	}
-	
+
+    /**
+     * Splits string into words in an array.
+     * 
+     * @param s string to split
+     * @param *buffer array of strings to split s into.
+     * @return buffer size.
+     */	
 	int tokenize(std::string s, std::string *buffer)
 	{
 	    std::stringstream ss(s);
@@ -35,10 +49,14 @@ public:
 	}
 	
 	
-	/*
-	 * return 1: close requested
-	 * Procesa una linea
-	 */
+	/**
+     * Analizes line input from user,
+     * sends relevant workload to FileSystem.
+     * 
+     * @param line string to analise.
+     * @param *fs file system to use.
+     * @return 0 if can recieve more input. 1 if user requested exit.
+     */
 	int process(std::string line, FileSystem *fs)
 	{
 	    std::cout << RESET;

@@ -5,9 +5,6 @@
 /// PRIVATE METHODS
 /// ******************************************
 
-/* Retorna primera posicion de memoria sin uso.
- * Si no hay espacio en memoria, retorna -1;
- */
 int FileSystem::encontrarBloqueVacio()
 {
 	if(entregaAleatoria)
@@ -52,9 +49,6 @@ int FileSystem::encontrarIndiceFAT(int bloqueInicial, int indice, int count)
 	return encontrarIndiceFAT( fat[bloqueInicial], indice, count+1);
 };
 
-/* 
- * Retorna el string empezando en lugar dado de la memoria  
- */
 std::string FileSystem::stringDesde(int bloqueInicial)
 {
 	if(bloqueInicial == -1) return "";
@@ -81,9 +75,6 @@ int FileSystem::eliminarRecursivo(int bloque)
 	return eliminarRecursivo( temp );
 };
 
-/*
- * Find user with name, else return -1.
- */
 int FileSystem::getUserIndex(std::string name)
 {
     int index = -1;
@@ -98,9 +89,6 @@ int FileSystem::getUserIndex(std::string name)
 	return index;
 };
 
-/*
- * Find group with name, else return -1.
- */
 int FileSystem::getGroupIndex(std::string name)
 {
     int index = -1;
@@ -115,9 +103,6 @@ int FileSystem::getGroupIndex(std::string name)
 	return index;
 };
 
-/*
- * Find file with name, else return -1.
- */
 int FileSystem::getEntryIndex(std::string name)
 {
 	int entryIndex = -1;
@@ -166,13 +151,72 @@ Group FileSystem::getGroupWithId(int groupId)
     return *(new Group());
 };
 
+bool FileSystem::canCurrentUserModifyFile(std::string filename)
+{
+    int fileId = getEntryIndex(filename);
+    File fileInfo = directorio[fileId];
+    if(currentUserIndex==0) return true; //root
+    if(fileInfo.publicCanWrite) return true;
+    if((fileInfo.ownerCanWrite)
+        &&(currentUserIndex==fileInfo.ownerId)) return true;
+    if(fileInfo.groupCanWrite)
+    {
+        // primary group
+        if(users[currentUserIndex].primaryGroupId==fileInfo.groupId)
+            return true;
+        Group currentGroup = getGroupWithId(users[currentUserIndex].primaryGroupId);
+        // secondary members
+        for(int i = 0; i < currentGroup.memberCount; i++)
+        {
+            if(currentGroup.memberIdList[i] == users[currentUserIndex].id)
+                return true;
+        }
+    }
+    return false;
+};
+
+bool FileSystem::canCurrentUserReadFile(std::string filename)
+{
+    int fileId = getEntryIndex(filename);
+    File fileInfo = directorio[fileId];
+    if(currentUserIndex==0) return true; //root
+    if(fileInfo.publicCanRead) return true;
+    if((fileInfo.ownerCanRead)&&(currentUserIndex==fileInfo.ownerId))
+        return true;
+    if(fileInfo.groupCanRead)
+    {
+        // primary group
+        if(users[currentUserIndex].primaryGroupId==fileInfo.groupId)
+            return true;
+        Group currentGroup = getGroupWithId(users[currentUserIndex].primaryGroupId);
+        // secondary members
+        for(int i = 0; i < currentGroup.memberCount; i++)
+        {
+            if(currentGroup.memberIdList[i] == users[currentUserIndex].id)
+                return true;
+        }
+    }
+    return false;
+};
+
+int FileSystem::getPrimaryMemberIdsInGroup(int groupId, int *buffer)
+{
+    int len = 0;
+    for(int i = 0; i < userCount; i++)
+    {
+        if(users[i].primaryGroupId == groupId)
+        {
+            buffer[len] = users[i].id;
+            len++;
+        }
+    }
+    return len;
+};
+
 /// ******************************************
 /// PUBLIC METHODS
 /// ******************************************
 
-/*
- * Constructor
- */
 FileSystem::FileSystem()
 {
 	directorio.reserve(SIZE);
@@ -193,9 +237,6 @@ std::string FileSystem::getName()
             getGroupNameAt(users[currentUserIndex].primaryGroupId);
 };
 
-/* retorna 0 si todo bien
- * si no, hubo problema
- */
 int FileSystem::createGroup(std::string name)
 {
     if(groupCount>=SIZE)
@@ -211,9 +252,6 @@ int FileSystem::createGroup(std::string name)
     return 0;
 };
 
-/* retorna 0 si todo bien
- * si no, hubo problema
- */
 int FileSystem::crear(std::string nombre)
 {
 	//std::cerr << "crear: " << nombre << "\n";
@@ -244,20 +282,6 @@ int FileSystem::crear(std::string nombre)
 	return 0;
 };
 
-int FileSystem::getPrimaryMemberIdsInGroup(int groupId, int *buffer)
-{
-    int len = 0;
-    for(int i = 0; i < userCount; i++)
-    {
-        if(users[i].primaryGroupId == groupId)
-        {
-            buffer[len] = users[i].id;
-            len++;
-        }
-    }
-    return len;
-};
-
 void FileSystem::printFiles()
 {
     std::cout << RESET << BOLD;
@@ -265,7 +289,7 @@ void FileSystem::printFiles()
 	std::cout << RESET;
 	for(int i = 0; i < entradasTotales; i++)
 	{
-		Entry entrada = directorio[i];
+		File entrada = directorio[i];
         std::string flags;
         if(entrada.ownerCanWrite) flags+="w"; else flags+="-";
         if(entrada.ownerCanRead) flags+="r"; else flags+="-";
@@ -307,9 +331,6 @@ void FileSystem::printUsers()
 	std::cout << RESET;
 }
 
-/*
- * Display all members including those who have group as primary
- */
 void FileSystem::printGroups()
 {
     std::cout << RESET << BOLD;
@@ -340,56 +361,8 @@ void FileSystem::printGroups()
 	std::cout << RESET;
 }
 
-bool FileSystem::canCurrentUserModifyFile(std::string filename)
-{
-    int fileId = getEntryIndex(filename);
-    Entry fileInfo = directorio[fileId];
-    if(currentUserIndex==0) return true; //root
-    if(fileInfo.publicCanWrite) return true;
-    if((fileInfo.ownerCanWrite)
-        &&(currentUserIndex==fileInfo.ownerId)) return true;
-    if(fileInfo.groupCanWrite)
-    {
-        // primary group
-        if(users[currentUserIndex].primaryGroupId==fileInfo.groupId)
-            return true;
-        Group currentGroup = getGroupWithId(users[currentUserIndex].primaryGroupId);
-        // secondary members
-        for(int i = 0; i < currentGroup.memberCount; i++)
-        {
-            if(currentGroup.memberIdList[i] == users[currentUserIndex].id)
-                return true;
-        }
-    }
-    return false;
-};
-
-bool FileSystem::canCurrentUserReadFile(std::string filename)
-{
-    int fileId = getEntryIndex(filename);
-    Entry fileInfo = directorio[fileId];
-    if(currentUserIndex==0) return true; //root
-    if(fileInfo.publicCanRead) return true;
-    if((fileInfo.ownerCanRead)&&(currentUserIndex==fileInfo.ownerId))
-        return true;
-    if(fileInfo.groupCanRead)
-    {
-        // primary group
-        if(users[currentUserIndex].primaryGroupId==fileInfo.groupId)
-            return true;
-        Group currentGroup = getGroupWithId(users[currentUserIndex].primaryGroupId);
-        // secondary members
-        for(int i = 0; i < currentGroup.memberCount; i++)
-        {
-            if(currentGroup.memberIdList[i] == users[currentUserIndex].id)
-                return true;
-        }
-    }
-    return false;
-};
-
 /// ******************************************
-/// METHODS THAT NEED PASSWORDS
+/// METHODS THAT CHECK PASSWORDS
 /// ******************************************
 
 int FileSystem::switchUser(std::string name)
@@ -402,9 +375,6 @@ int FileSystem::switchUser(std::string name)
     return 0;
 };
 
-/* retorna 0 si todo bien
- * si no, hubo problema
- */
 int FileSystem::createUser(std::string name, std::string groupName, std::string password)
 {
     if(userCount>=SIZE)
@@ -467,9 +437,6 @@ int FileSystem::readFile(std::string filename)
     return 0;
 };
 
-/* retorna 0 si todo bien
- * si no, hubo problema
- */
 int FileSystem::escribir(std::string nombre, int index, char caracter)
 {
 	int entryIndex = getEntryIndex(nombre);
@@ -488,9 +455,6 @@ int FileSystem::escribir(std::string nombre, int index, char caracter)
 	return 0;
 };
 
-/* retorna 0 si todo bien
- * si no, hubo problema
- */
 int FileSystem::agregar(std::string nombre, char caracter)
 {
 	int entryIndex = getEntryIndex(nombre);
@@ -526,9 +490,6 @@ int FileSystem::agregar(std::string nombre, char caracter)
 	return 0;
 };
 
-/* retorna 0 si todo bien
- * si no, hubo problema
- */
 int FileSystem::agregar(std::string nombre, std::string str)
 {
     for(int i = 0; i < str.length(); i++) {
@@ -560,7 +521,9 @@ int FileSystem::eliminar(std::string nombre, bool seguro)
 	return 0;
 };
 
+/// ******************************************
 /// DEBUG METHODS
+/// ******************************************
 
 void FileSystem::usarAsignacionAleatoria(bool usar)
 {
@@ -574,7 +537,7 @@ void FileSystem::imprimirStrings()
 	std::cout << RESET;
 	for(int i = 0; i < entradasTotales; i++)
 	{
-		Entry entrada = directorio[i];
+		File entrada = directorio[i];
 		std::cout << entrada.nombre << ": ";
 		std::cout << stringDesde(entrada.bloqueInicial);
 		std::cout << "\n";

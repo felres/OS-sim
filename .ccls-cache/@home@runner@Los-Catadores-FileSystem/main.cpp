@@ -7,9 +7,11 @@
  * Javier Donato B92650
  * 
  * To Do:
- * - Comentar codigo
+ * - Comentar codigo (IN ENGLISH)
  * - terminar transición de arrays a std::vectors
- * - 
+
+ * - rename directorio to files
+ * - distinguish between index and id
  */
 
 #include <iostream>
@@ -17,23 +19,16 @@
 #include "helpers.cpp"
 #include "Interface.hpp"
 
-//ELEMENTOS DEL PROGRAMA
-//1. Bloques son de 1 caracter
-//2. Unidad es un arreglo de caracteres
-//3. Tamaño SIZE caracteres, por el momento
-//4. Usando FAT
-//5. Usando un struct para el directorio (nombre, bloque inicial, fecha, por el momento)
-//6. Permisos
 
 
-
-
+/**
+ * Creates and executes user interface.
+ */
 int main() {
     // random seed
     srand( time(NULL) );
     
     FileSystem *fs = new FileSystem();
-	Interface consola;
-	consola.run(fs);
+	Interface console;
+	console.run(fs);
 }
-  
