@@ -2,12 +2,20 @@
 
 #include <string>
 #include "FileSystem.hpp"
+#include "Padrone.hpp"
+#include "VotesReg.hpp"
 
 class Interface{
 private:
 	std::string input;
+    Padrone *padroneApp;
+    VotesReg *voteApp;
 public:
-	Interface(){}
+	Interface(Padrone* padroneApp, VotesReg* voteApp)
+    {
+        this->padroneApp = padroneApp;
+        this->voteApp = voteApp;
+    }
 	~Interface(){}
 
     /**
@@ -28,25 +36,6 @@ public:
 	    }
 		return 0;
 	}
-
-    /**
-     * Splits string into words in an array.
-     * 
-     * @param s string to split
-     * @param *buffer array of strings to split s into.
-     * @return buffer size.
-     */	
-	int tokenize(std::string s, std::string *buffer)
-	{
-	    std::stringstream ss(s);
-	    std::string word;
-	    int len = 0;
-	    while (ss >> word) {
-	        buffer[len] = word;
-	        ++len;
-	    }
-	    return len;
-	}
 	
 	
 	/**
@@ -60,8 +49,9 @@ public:
 	int process(std::string line, FileSystem *fs)
 	{
 	    std::cout << RESET;
-	    std::string argv[SIZE];
-	    int argc = tokenize(line, argv);
+	    
+        std::vector<std::string> argv = tokenize(line, " ");
+	    int argc = argv.size();
 	    
 	    if(argc > 0)
 	    {
@@ -83,19 +73,23 @@ public:
 	            std::cout << RESET << BOLD;
 		        std::cout << "     Command| Description" << "\n";
 	            std::cout << RESET;
-	            std::cout << "    filelist| list files" << "\n";
-	            std::cout << "    userlist| list users" << "\n";
-	            std::cout << "   grouplist| list groups" << "\n";
-	            std::cout << "     fileadd| create file" << "\n";
-	            std::cout << "     useradd| create user" << "\n";
-	            std::cout << "    groupadd| create group" << "\n";
-	            std::cout << "  switchuser| switch user" << "\n";
-	            std::cout << "        read| read file" << "\n";
-	            std::cout << "       write| write in file" << "\n";
-	            std::cout << "      append| append to file" << "\n";
-	            std::cout << "      remove| remove file" << "\n";
-	            std::cout << "  changemode| change file modes" << "\n";
-	            std::cout << "        exit| close the program" << "\n";
+	            printWithUnderlineAt("    filelist| list files\n",4,8);
+	            printWithUnderlineAt("    userlist| list users\n",4,8);
+	            printWithUnderlineAt("   grouplist| list groups\n",3,8);
+	            printWithUnderlineAt("     fileadd| create file\n",5,9);
+	            printWithUnderlineAt("     useradd| create user\n",5,9);
+	            printWithUnderlineAt("    groupadd| create group\n",4,9);
+	            printWithUnderlineAt("  switchuser| switch user\n",2,8);
+	            printWithUnderlineAt("        read| read file\n",8);
+	            printWithUnderlineAt("       write| write in file\n",7);
+	            printWithUnderlineAt("      append| append to file\n",6);
+	            printWithUnderlineAt("      remove| remove file\n",6,8);
+	            printWithUnderlineAt("  changemode| change file modes\n",2,3,8,9,10);
+                printWithUnderlineAt("loadrealfile| load a real file\n",0,4,8);
+                printWithUnderlineAt("  padroneapp| open a file as a padrone\n",2,9);
+                printWithUnderlineAt("     voteapp| open a file as a vote register\n",5,9);
+                printWithUnderlineAt("    password| set or change password\n",4,8);
+	            printWithUnderlineAt("        exit| close the program\n");
 	            std::cout << RESET << BOLD;
 		        std::cout << "      (DEBUG ONLY)" << "\n";
 	            std::cout << RESET;
@@ -132,10 +126,8 @@ public:
 	        {
 	            if(argc > 2)
 	            {
-	                if(fs->createUser(argv[1], argv[2], "")==0)
-	                    std::cout << "(user password WIP)\n";
-	                else
-	                    std::cout << "messed up useradd\n";
+	                if(fs->createUser(argv[1], argv[2])==0)
+	                    std::cout << "Added user.\n";
 	            }
 	            else
 	                std::cout << "Use: useradd [user name] [primary group name]\n";
@@ -214,6 +206,45 @@ public:
 	            }
 	            else
 	                std::cout << "Use: changemode [file name] [flag(0-8)] [t/f]\n";
+	        }
+            else if((argv[0] == "loadrealfile")||(argv[0] == "lrf"))
+	        {
+	            if(argc > 1)
+	            {
+	                fs->loadRealFile(argv[1]);
+	            }
+	            else
+	                std::cout << "Use: loadrealfile [REAL file name]\n";
+	        }
+            else if((argv[0] == "padroneapp")||(argv[0] == "pa"))
+	        {
+                if(argc > 1)
+	            {
+                    if( fs->canCurrentUserExecuteFile(argv[1]) )
+                        padroneApp->run(argv[1]);
+                    else
+                        std::cout << "No permission to execute " << argv[1] << ".\n";
+                }
+                else
+	                std::cout << "Use: padroneapp [file name]\n";
+	        }
+            else if((argv[0] == "voteapp")||(argv[0] == "va"))
+	        {
+	            if(argc > 1)
+	            {
+                    if( fs->canCurrentUserExecuteFile(argv[1]) )
+                        //voteApp->start(argv[1]);
+                        std::cout << "Vote App Start";
+                    else
+                        std::cout << "No permission to execute "
+                                << argv[1] << ".\n";
+	            }
+	            else
+	                std::cout << "Use: voteapp [file name]\n";
+	        }
+            else if((argv[0] == "password")||(argv[0] == "passwd")||(argv[0] == "pw"))
+	        {
+	            fs->changePassword();
 	        }
 	        else if((argv[0] == "close")||(argv[0] == "exit"))
 	        {

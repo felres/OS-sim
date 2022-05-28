@@ -1,9 +1,19 @@
 #include "FileSystem.hpp"
-
+#include "helpers.cpp"
 
 /// ******************************************
 /// PRIVATE METHODS
 /// ******************************************
+
+std::string encrypt(std::string str)
+{
+    return ceasarShift(str, +1);
+};
+
+std::string decrypt(std::string str)
+{
+    return ceasarShift(str, -1);
+};
 
 int FileSystem::getAvailableBlock()
 {
@@ -151,6 +161,30 @@ Group FileSystem::getGroupWithId(int groupId)
     return *(new Group());
 };
 
+bool FileSystem::canCurrentUserExecuteFile(std::string filename)
+{
+    int fileId = getFileIndex(filename);
+    File fileInfo = directorio[fileId];
+    if(currentUserIndex==0) return true; //root
+    if(fileInfo.publicCanExecute) return true;
+    if((fileInfo.ownerCanExecute)
+        &&(currentUserIndex==fileInfo.ownerId)) return true;
+    if(fileInfo.groupCanExecute)
+    {
+        // primary group
+        if(users[currentUserIndex].primaryGroupId==fileInfo.groupId)
+            return true;
+        Group currentGroup = getGroupWithId(users[currentUserIndex].primaryGroupId);
+        // secondary members
+        for(int i = 0; i < currentGroup.memberCount; i++)
+        {
+            if(currentGroup.memberIdList[i] == users[currentUserIndex].id)
+                return true;
+        }
+    }
+    return false;
+};
+
 bool FileSystem::canCurrentUserModifyFile(std::string filename)
 {
     int fileId = getFileIndex(filename);
@@ -280,6 +314,19 @@ int FileSystem::createFile(std::string name)
 	return 0;
 };
 
+int FileSystem::loadRealFile(std::string filename)
+{
+    std::vector<std::string> vec = readFileToVector(filename);
+    if(vec.size() == 0) return err("no info", 1);
+    createFile(filename);
+    for(int i = 0; i < vec.size(); i++)
+    {
+        appendToFile(filename, vec[i]);
+        appendToFile(filename, "\n");
+    }
+    return 0;
+};
+
 void FileSystem::printFiles()
 {
     std::cout << RESET << BOLD;
@@ -314,12 +361,12 @@ void FileSystem::printFiles()
 void FileSystem::printUsers()
 {
     std::cout << RESET << BOLD;
-	std::cout << " Id|    Name|        Password| Primary Group" << "\n";
+	std::cout << " Id|        Name|        Password| Primary Group" << "\n";
 	std::cout << RESET;
 	for(int i = 0; i < userCount; i++)
 	{
         std::cout << std::setw(3) << users[i].id << "|";
-        std::cout << std::setw(8) << users[i].name << "|";
+        std::cout << std::setw(12) << users[i].name << "|";
         std::cout << std::setw(16) << users[i].password << "|";
         std::cout << std::setw(14)
             << getGroupNameAt(users[i].primaryGroupId);
@@ -363,14 +410,51 @@ void FileSystem::printGroups()
 /// METHODS THAT CHECK PASSWORDS
 /// ******************************************
 
+int FileSystem::changePassword()
+{
+    if(currentUserIndex == -1) return err("No user selected.", 1);
+    std::string pass = users[currentUserIndex].password;
+    if(pass=="")
+    {
+        // Set password for the first time
+        std::cout << RESET << BOLD;
+        std::cout << "Creating password for user "+getUserNameAt(currentUserIndex)+".\n";
+        users[currentUserIndex].password = encrypt(requestPasswordRaw("Enter password: "));
+    }
+    else
+    {
+        // Change current password
+        std::cout << RESET << BOLD;
+        std::cout << "Changing password for user "+getUserNameAt(currentUserIndex)+".\n";
+        if(encrypt(requestPasswordRaw("Current password: "))==pass)
+        {
+            users[currentUserIndex].password = encrypt(requestPasswordRaw("New password: "));
+        }
+        else
+            return err("Wrong password!\n", 1);
+    }
+    return 0;
+};
+
 int FileSystem::switchUser(std::string name)
 {
     int userIndex = getUserIndex(name);
-	if(userIndex==-1) return err("No existe user " + name, 2);
-    // pedir clave
-    std::cout << "(password request WIP)\n";
+	if(userIndex==-1) return err("User "+name+" does not exist.", 2);
+    std::string pass = users[userIndex].password;
+    if((pass!="")&&(requestPasswordRaw("Enter password: ") != pass))
+        return err("Incorrect password!", 3);
     currentUserIndex = userIndex;
     return 0;
+};
+
+std::string FileSystem::requestPasswordRaw(std::string str)
+{
+    std::cout << RESET << BOLD;
+    std::cout << str;
+    std::cout << RESET;
+    std::string input;
+    std::getline(std::cin, input);
+    return input;
 };
 
 int FileSystem::createUser(std::string name, std::string groupName, std::string password)
@@ -381,7 +465,27 @@ int FileSystem::createUser(std::string name, std::string groupName, std::string 
 	if(userIndex!=-1) return err("Ya existe user " + name, 2);
     int groupIndex = getGroupIndex(groupName);
     if(groupIndex==-1) return err("No existe grupo " + groupName, 3);
-        
+    
+    users[userCount].id = userCount;
+    users[userCount].name = name;
+    users[userCount].password = password;
+    users[userCount].primaryGroupId = groupIndex;
+    
+    userCount++;
+    return 0;
+};
+
+int FileSystem::createUser(std::string name, std::string groupName)
+{
+    if(userCount>=SIZE)
+		return err("Sin espacio para user: " + (std::string)name, 1);
+	int userIndex = getUserIndex(name);
+	if(userIndex!=-1) return err("Ya existe user " + name, 2);
+    int groupIndex = getGroupIndex(groupName);
+    if(groupIndex==-1) return err("No existe grupo " + groupName, 3);
+
+    std::string password = requestPasswordRaw("New password for "+name+": ");
+    
     users[userCount].id = userCount;
     users[userCount].name = name;
     users[userCount].password = password;
@@ -547,7 +651,7 @@ void FileSystem::imprimirStrings()
 void FileSystem::imprimirDirectorio()
 {
 	std::cout << RESET << BOLD;
-	std::cout << "Directorio:" << "\n";
+	std::cout << "Files:" << "\n";
 	std::cout << " Índice|    Nombre| Bloque Inicial| Contenido" << "\n";
 	std::cout << RESET;
 	for(int i = 0; i < directorio.size(); i++)
@@ -558,7 +662,8 @@ void FileSystem::imprimirDirectorio()
 		std::string inistr = std::to_string(ini);
 		if(ini==-1) inistr += " (n/a)";
 		std::cout << std::setw(15) << inistr << "|";
-        std::cout << " " << getStringFrom(directorio[i].bloqueInicial);
+        std::cout << " ";
+        printReplacing(getStringFrom(directorio[i].bloqueInicial), '\n', '#');
 		std::cout << "\n";
 	}
 	std::cout << "\n";
@@ -566,7 +671,7 @@ void FileSystem::imprimirDirectorio()
 
 void FileSystem::imprimirFAT(int cols)
 {
-	int espacio = 3;
+	int espacio = 4;
 	std::cout << RESET << BOLD;
 	std::cout << "File Allocation Table (FAT):" << "\n";
 	for(int i = 0; i < SIZE; i++) {
@@ -585,17 +690,22 @@ void FileSystem::imprimirFAT(int cols)
 
 void FileSystem::imprimirMemoria(int cols)
 {
-	int espacio = 3;
 	std::cout << RESET << BOLD;
-	std::cout << "Unidad De Memoria:" << "\n";
+	std::cout << "Memory Unit:";
+    std::cout << RESET;
+    printReplacing(" (\n = newline)", '\n', '#');
+    std::cout << "\n";
 	for(int i = 0; i < SIZE; i++) {
 		std::cout << RESET << FAINT;
-		std::cout << std::setw(espacio) << i;
+		std::cout << std::setw(3) << i;
 		std::cout << RESET << BOLD;
 		if (!unidadDeMemoria[i])
-			std::cout << std::setw(espacio) << " ";	
+			std::cout << "   ";	
 		else 
-			std::cout << std::setw(espacio) << unidadDeMemoria[i];
+        {
+            std::cout << "  ";
+            printReplacing(chToStr(unidadDeMemoria[i]), '\n', '#');
+        }
 		std::cout << RESET << FAINT;
 		std::cout << "|";
 		

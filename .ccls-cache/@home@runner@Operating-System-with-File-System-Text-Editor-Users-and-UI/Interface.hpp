@@ -28,25 +28,6 @@ public:
 	    }
 		return 0;
 	}
-
-    /**
-     * Splits string into words in an array.
-     * 
-     * @param s string to split
-     * @param *buffer array of strings to split s into.
-     * @return buffer size.
-     */	
-	int tokenize(std::string s, std::string *buffer)
-	{
-	    std::stringstream ss(s);
-	    std::string word;
-	    int len = 0;
-	    while (ss >> word) {
-	        buffer[len] = word;
-	        ++len;
-	    }
-	    return len;
-	}
 	
 	
 	/**
@@ -60,8 +41,9 @@ public:
 	int process(std::string line, FileSystem *fs)
 	{
 	    std::cout << RESET;
-	    std::string argv[SIZE];
-	    int argc = tokenize(line, argv);
+	    
+        std::vector<std::string> argv = tokenize(line, " ");
+	    int argc = argv.size();
 	    
 	    if(argc > 0)
 	    {
@@ -95,6 +77,9 @@ public:
 	            std::cout << "      append| append to file" << "\n";
 	            std::cout << "      remove| remove file" << "\n";
 	            std::cout << "  changemode| change file modes" << "\n";
+                std::cout << "loadrealfile| load a real file" << "\n";
+                std::cout << "  padroneapp| open a file as a padrone" << "\n";
+                std::cout << "     voteapp| open a file as a vote register" << "\n";
 	            std::cout << "        exit| close the program" << "\n";
 	            std::cout << RESET << BOLD;
 		        std::cout << "      (DEBUG ONLY)" << "\n";
@@ -132,7 +117,7 @@ public:
 	        {
 	            if(argc > 2)
 	            {
-	                if(fs->createUser(argv[1], argv[2], "")==0)
+	                if(fs->createUser(argv[1], argv[2])==0)
 	                    std::cout << "(user password WIP)\n";
 	                else
 	                    std::cout << "messed up useradd\n";
@@ -214,6 +199,43 @@ public:
 	            }
 	            else
 	                std::cout << "Use: changemode [file name] [flag(0-8)] [t/f]\n";
+	        }
+            else if((argv[0] == "loadrealfile")||(argv[0] == "lrf"))
+	        {
+	            if(argc > 1)
+	            {
+	                fs->loadRealFile(argv[1]);
+	            }
+	            else
+	                std::cout << "Use: loadrealfile [REAL file name]\n";
+	        }
+            else if((argv[0] == "padroneapp")||(argv[0] == "pa"))
+	        {
+	            if(argc > 1)
+	            {
+                    if( fs->canCurrentUserExecuteFile(argv[1]) )
+                      std::cout << "Padrone App Start";  
+											//padroneApp->start(argv[1]);
+                    else
+                        std::cout << "No permission to execute "
+                                << argv[1] << ".\n";
+	            }
+	            else
+	                std::cout << "Use: padroneapp [file name]\n";
+	        }
+            else if((argv[0] == "voteapp")||(argv[0] == "va"))
+	        {
+	            if(argc > 1)
+	            {
+                    if( fs->canCurrentUserExecuteFile(argv[1]) )
+                        //voteApp->start(argv[1]);
+											std::cout << "Vote App Start";
+                    else
+                        std::cout << "No permission to execute "
+                                << argv[1] << ".\n";
+	            }
+	            else
+	                std::cout << "Use: voteapp [file name]\n";
 	        }
 	        else if((argv[0] == "close")||(argv[0] == "exit"))
 	        {

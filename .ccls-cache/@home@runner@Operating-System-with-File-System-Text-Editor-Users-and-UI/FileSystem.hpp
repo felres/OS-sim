@@ -77,6 +77,12 @@ private:
     User users[SIZE];
     int userCount = 0;
 
+    std::string requestPasswordRaw(std::string str);
+
+    std::string encrypt(std::string str);
+
+    std::string decrypt(std::string str);
+
     /**
      * Can either search for a block randomly or sequentially.
      * 
@@ -112,8 +118,9 @@ private:
     int getLastBlockInChainFrom(int block);
 
     /**
-     * Description.
+     * Recursively finds specific index in FAT string.
      * Should always be called with count=0 for the first time.
+     * Its useful for finding a specific index in the string. 
      * 
      * @param blockIndex Index in FAT to start from.
      * @param index Index we need.
@@ -123,7 +130,8 @@ private:
     int getBlockInChainAtIndex(int blockIndex, int index, int count);
     
     /**
-     * Description.
+     * Works like getLastBlockInChainFrom, but saves a string to
+     * global variable and returns it.
      * 
      * @param
      * @return
@@ -131,7 +139,7 @@ private:
     std::string getStringFrom(int bloqueInicial);
 
     /**
-     * Description.
+     * Recursive element of getStringFrom.
      * 
      * @param
      * @return
@@ -202,6 +210,14 @@ private:
      */
     Group getGroupWithId(int groupId);
 
+    
+
+public:
+    /**
+     * Constructor
+     */
+    FileSystem();
+
     /**
      * Description.
      * 
@@ -209,6 +225,8 @@ private:
      * @return
      */
     bool canCurrentUserModifyFile(std::string filename);
+
+    int changePassword();
 
     /**
      * Description.
@@ -218,11 +236,13 @@ private:
      */
     bool canCurrentUserReadFile(std::string filename);
 
-public:
     /**
-     * Constructor
+     * Description.
+     * 
+     * @param
+     * @return
      */
-    FileSystem();
+    bool canCurrentUserExecuteFile(std::string filename);
 
     /**
      * Description.
@@ -246,6 +266,7 @@ public:
      * @param
      * @return
      */
+    int createUser(std::string name, std::string groupName);
     int createUser(std::string name, std::string groupName, std::string password);
 
     /**
@@ -336,7 +357,9 @@ public:
      * @param
      * @return
      */
-    int loadTest();    
+    int loadTest();
+
+    int loadRealFile(std::string filename);
 
     /**
      * Description.

@@ -22,6 +22,9 @@
 #include "FileSystem.hpp"
 #include "helpers.cpp"
 #include "Interface.hpp"
+/*
+#include "Padrone.hpp"
+#include "VotesReg.hpp"
 
 
 
@@ -32,6 +35,9 @@ int main() {
     randomize();
     
     FileSystem *fs = new FileSystem();
+    Padrone *padroneApp = new Padrone(fs);
+    VotesReg *voteApp = new VotesReg(fs);
+    
 	Interface console;
 	console.run(fs);
 }
