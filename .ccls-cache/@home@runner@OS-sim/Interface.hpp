@@ -73,23 +73,23 @@ public:
 	            std::cout << RESET << BOLD;
 		        std::cout << "     Command| Description" << "\n";
 	            std::cout << RESET;
-	            std::cout << "    filelist| list files" << "\n";
-	            std::cout << "    userlist| list users" << "\n";
-	            std::cout << "   grouplist| list groups" << "\n";
-	            std::cout << "     fileadd| create file" << "\n";
-	            std::cout << "     useradd| create user" << "\n";
-	            std::cout << "    groupadd| create group" << "\n";
-	            std::cout << "  switchuser| switch user" << "\n";
-	            std::cout << "        read| read file" << "\n";
-	            std::cout << "       write| write in file" << "\n";
-	            std::cout << "      append| append to file" << "\n";
-	            std::cout << "      remove| remove file" << "\n";
-	            std::cout << "  changemode| change file modes" << "\n";
-                std::cout << "loadrealfile| load a real file" << "\n";
-                std::cout << "  padroneapp| open a file as a padrone" << "\n";
-                std::cout << "     voteapp| open a file as a vote register" << "\n";
-                std::cout << "    password| set or change password" << "\n";
-	            std::cout << "        exit| close the program" << "\n";
+	            printWithUnderlineAt("    filelist| list files\n",4,8);
+	            printWithUnderlineAt("    userlist| list users\n",4,8);
+	            printWithUnderlineAt("   grouplist| list groups\n",3,8);
+	            printWithUnderlineAt("     fileadd| create file\n",5,9);
+	            printWithUnderlineAt("     useradd| create user\n",5,9);
+	            printWithUnderlineAt("    groupadd| create group\n",4,9);
+	            printWithUnderlineAt("  switchuser| switch user\n",2,8);
+	            printWithUnderlineAt("        read| read file\n",8);
+	            printWithUnderlineAt("       write| write in file\n",7);
+	            printWithUnderlineAt("      append| append to file\n",6);
+	            printWithUnderlineAt("      remove| remove file\n",6,8);
+	            printWithUnderlineAt("  changemode| change file modes\n",2,3,8,9,10);
+                printWithUnderlineAt("loadrealfile| load a real file\n",0,4,8);
+                printWithUnderlineAt("  padroneapp| open a file as a padrone\n",2,9);
+                printWithUnderlineAt("     voteapp| open a file as a vote register\n",5,9);
+                printWithUnderlineAt("    password| set or change password\n",4,8);
+	            printWithUnderlineAt("        exit| close the program\n");
 	            std::cout << RESET << BOLD;
 		        std::cout << "      (DEBUG ONLY)" << "\n";
 	            std::cout << RESET;
@@ -233,8 +233,7 @@ public:
 	            if(argc > 1)
 	            {
                     if( fs->canCurrentUserExecuteFile(argv[1]) )
-                        //voteApp->start(argv[1]);
-                        std::cout << "Vote App Start";
+                        voteApp->run(argv[1]);
                     else
                         std::cout << "No permission to execute "
                                 << argv[1] << ".\n";

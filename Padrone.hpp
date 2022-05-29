@@ -7,7 +7,9 @@
 class Padrone {
 private: 
 	FileSystem* fs;
-    int padroneFileIndex = -1; // ?
+
+    /// Index of padrone file we are executing, stored in fs->directorio[]
+    int padroneFileIndex = -1;
 
     // process related
     int processNewPadrone();
@@ -29,6 +31,9 @@ public:
         fs=filesys;
     };
 
+    int processAddPerson();
+    
+    int processSavePadroneFileIntoRealFile();
 
     int openPadrone(std::string filename);
 

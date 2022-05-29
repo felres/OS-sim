@@ -210,6 +210,7 @@ static std::vector<std::string> tokenize(std::string text, std::string delim)
 
 static int writeFile(std::string fileName, std::string str)
 {
+    remove(fileName.c_str());
     std::ofstream myfile;
     myfile.open (fileName);
     myfile << str;

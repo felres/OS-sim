@@ -550,9 +550,13 @@ int FileSystem::readFile(std::string filename)
     if(!canCurrentUserReadFile(filename))
         return err("User cannot read " + filename, 3);
 
-    std::cout << "\""
-                << getStringFrom(directorio[entryIndex].bloqueInicial)
-                << "\"\n";
+    std::cout << GREEN << FAINT;
+    std::cout << "↓ " << filename << "\n";
+    std::cout << RESET;
+    std::cout << getStringFrom(directorio[entryIndex].bloqueInicial);
+    std::cout << GREEN << FAINT;
+    std::cout << "↑ (EOF)" << "\n";
+    std::cout << RESET;
     
     return 0;
 };

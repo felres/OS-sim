@@ -233,8 +233,7 @@ public:
 	            if(argc > 1)
 	            {
                     if( fs->canCurrentUserExecuteFile(argv[1]) )
-                        //voteApp->start(argv[1]);
-                        std::cout << "Vote App Start";
+                        voteApp->run(argv[1]);
                     else
                         std::cout << "No permission to execute "
                                 << argv[1] << ".\n";

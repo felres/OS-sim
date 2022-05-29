@@ -1,9 +1,13 @@
+#include <algorithm>
+#include <ctype.h>
+#include <fstream>
+#include <ios>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <string>
+#include <vector>
 #include "Padrone.hpp"
 #include "helpers.cpp"
 
@@ -22,7 +26,9 @@ int Padrone::run(std::string filename)
         std::cout << "1. Read entire padrone." << "\n";
         std::cout << "2. Check info about a single person." << "\n";
         std::cout << "3. Set a person's voting status to TRUE." << "\n";
-        std::cout << "4. Exit." << "\n";
+        std::cout << "4. Add a new person to the padrone." << "\n";
+        std::cout << "5. Save current padrone into real padrone file." << "\n";
+        std::cout << "6. Exit." << "\n";
         std::cout << RESET;
         std::cout << "Decision: ";
         std::string input;
@@ -36,9 +42,40 @@ int Padrone::run(std::string filename)
             case 1: processPrintFullPadrone(); break;
             case 2: processPersonCheck(); break;
             case 3: processSetVotingStatus(); break;
-            case 4: cont = false; break;
+            case 4: processAddPerson(); break;
+            case 5: processSavePadroneFileIntoRealFile(); break;
+            case 6: cont = false; break;
         }
     }
+    return 0;
+};
+
+int Padrone::processAddPerson()
+{
+    std::string id, name, table, didVote, sfinal;
+    std::cout << "New person Id: ";
+    std::getline(std::cin, id);
+    if(doesPersonExist(id)) return err("Person with Id "+id+" already exists.", 1);
+    std::cout << "New person full name: ";
+    std::getline(std::cin, name);
+    // convert name to all uppercase
+    std::transform(name.begin(), name.end(), name.begin(), ::toupper); 
+    std::cout << "New person voting table: ";
+    std::getline(std::cin, table);
+    std::cout << "Has new person voted? (True/false): ";
+    std::getline(std::cin, didVote);
+    if(strToBool(didVote))
+        didVote = "1";
+    else
+        didVote = "0";
+    sfinal = id+","+name+","+table+","+didVote;
+    fs->appendToFile(getPadroneFileName(), sfinal);
+    return 0;
+};
+    
+int Padrone::processSavePadroneFileIntoRealFile()
+{
+    writeFile(getPadroneFileName(), fs->requestFileContents(getPadroneFileName()));
     return 0;
 };
 
@@ -80,7 +117,7 @@ int Padrone::processPrintFullPadrone()
     if(padroneFileIndex==-1) return err("No padrone file opened.", 1);
 
     
-    std::string fileStr = fs->requestFileContents( getPadroneFileName() );
+    std::string fileStr = fs->requestFileContents(getPadroneFileName());
     std::vector<std::string> vec = tokenize(fileStr, "\n");
     std::cout << RESET << BOLD;
 	std::cout << "         Id|                            Name| Place| Voted?" << "\n";
@@ -134,6 +171,7 @@ int Padrone::processPersonCheck()
     std::cout << RESET;
     return 0;
 };
+
 int Padrone::processSetVotingStatus()
 {
     if(padroneFileIndex==-1) return err("No padrone file opened.", 1);
@@ -159,20 +197,6 @@ int Padrone::loadFromRealFile(std::string filename)
 {
     // not urgent
     return 0;
-};
-
-int Padrone::appendtoFile(std::string filename, std::string str)
-{
-    // not urgent
-    return 0;
-};
-
-
-
-// return full line belonging to the person id belongs to
-std::string Padrone::getPerson(std::string id)
-{
-    return "";
 };
 
 std::vector<std::string> Padrone::getPersonColumn(std::string id)
