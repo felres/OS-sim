@@ -4,17 +4,27 @@
 #include "FileSystem.hpp"
 #include "Padrone.hpp"
 #include "VotesReg.hpp"
+#include "client.hpp"
+#include "server.hpp"
 
 class Interface{
 private:
 	std::string input;
     Padrone *padroneApp;
     VotesReg *voteApp;
+    Server *serverApp;
+    Client *clientApp;
+    
 public:
-	Interface(Padrone* padroneApp, VotesReg* voteApp)
+	Interface(Padrone* padroneApp,
+                VotesReg* voteApp,
+                Server* serverApp,
+                Client* clientApp)
     {
         this->padroneApp = padroneApp;
         this->voteApp = voteApp;
+        this->serverApp = serverApp;
+        this->clientApp = clientApp;
     }
 	~Interface(){}
 
@@ -94,8 +104,9 @@ public:
 		        std::cout << "      (DEBUG ONLY)" << "\n";
 	            std::cout << RESET;
 	            std::cout << "       print| print full memory unit" << "\n";
-	            std::cout << "        test| add template users, groups and files"
-	                            << "\n";
+	            std::cout << "        test| add template users, groups and files" << "\n";
+                std::cout << "      server| " << "\n";
+                std::cout << "      client| " << "\n";
 	            std::cout << "\n";
 	        }
 	        else if((argv[0] == "filelist")||(argv[0] == "fl")||(argv[0] == "ls"))
@@ -258,6 +269,14 @@ public:
 	        else if(argv[0] == "test")
 	        {
 	            fs->loadTest();
+	        }
+            else if(argv[0] == "server")
+	        {
+	            serverApp->run();
+	        }
+            else if(argv[0] == "client")
+	        {
+	            clientApp->run();
 	        }
 	        // Final conditional
 	        else if(argv[0] != "")

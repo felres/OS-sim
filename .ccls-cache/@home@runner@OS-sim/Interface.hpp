@@ -4,17 +4,27 @@
 #include "FileSystem.hpp"
 #include "Padrone.hpp"
 #include "VotesReg.hpp"
+#include "client.hpp"
+#include "server.hpp"
 
 class Interface{
 private:
 	std::string input;
     Padrone *padroneApp;
     VotesReg *voteApp;
+    Server *serverApp;
+    Client *clientApp;
+    
 public:
-	Interface(Padrone* padroneApp, VotesReg* voteApp)
+	Interface(Padrone* padroneApp,
+                VotesReg* voteApp,
+                Server* serverApp,
+                Client* clientApp)
     {
         this->padroneApp = padroneApp;
         this->voteApp = voteApp;
+        this->serverApp = serverApp;
+        this->clientApp = clientApp;
     }
 	~Interface(){}
 
