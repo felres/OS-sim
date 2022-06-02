@@ -13,6 +13,12 @@
 
 class Server{
 private:
+    int process(std::string str)
+    {
+        std::vector<std::string> vec  = tokenize(str, " ");
+        std::cout << "[Server] Got command: " << vec[0] << "\n";
+        return 0;
+    }
 public:
     int run()
     {
@@ -49,26 +55,19 @@ public:
                       (socklen_t*)&addrlen)) < 0)
             return err("accept", 5);
         
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        valread = read(new_socket, buffer, 1024);
-        std::cout << "[Server] Got message: " << buffer << "\n";
-        std::string str = "Hello from server.";
-        send(new_socket, str.c_str(), str.length(), 0);
-        std::cout << "[Server] Message sent." << "\n";
-       
+        while(true)
+        {
+            valread = read(new_socket, buffer, 1024);
+            process(buffer);
+            
+            
+            /*
+            std::string str = "Hello from server.";
+            send(new_socket, str.c_str(), str.length(), 0);
+            std::cout << "[Server] Message sent." << "\n";
+            */
+        }
+        
         // close connected socket
         close(new_socket);
 
