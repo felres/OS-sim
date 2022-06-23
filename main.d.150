@@ -1,2 +1,0 @@
-main.o: main.cpp FileSystem.hpp helpers.cpp Interface.hpp Padrone.hpp \
-  VotesReg.hpp
