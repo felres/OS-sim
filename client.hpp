@@ -15,34 +15,46 @@ private:
 public:
     int run()
     {
-        int sock = 0, valread, client_fd;
-        struct sockaddr_in serv_addr;
-        char buffer[1024] = { 0 };
-        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-            return err("Socket creation error.", 1);
+        randomize();
+        int resultado = 0;
+        int s = 0;
+        int n = 0;
+        char datos[256];
+        struct sockaddr_in ipServidor;
      
-        serv_addr.sin_family = AF_INET;
-        serv_addr.sin_port = htons(PORT);
+        memset(datos, '\0' ,sizeof(datos));
      
-        // Convert IPv4 and IPv6 addresses from text to binary
-        // form
-        if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)
-            <= 0)
-            return err("Invalid address", 2);
+        if((s = socket(AF_INET, SOCK_STREAM, 0))< 0)
+        {
+            std::cout << "Error de creación de socket" << "\n";
+            resultado=1 ;
+        }
+        else
+        {
+            ipServidor.sin_family = AF_INET;
+            ipServidor.sin_port = htons(1337);
+            ipServidor.sin_addr.s_addr = inet_addr("127.0.0.1");
      
-        if ((client_fd
-             = connect(sock, (struct sockaddr*)&serv_addr,
-                       sizeof(serv_addr))) < 0) 
-            return err("Connection failed!", 3);
-
-        std::string str = "Hello from client.";
-        send(sock, str.c_str(), str.length(), 0);
-        std::cout << "[Client] Message sent." << "\n";
-        valread = read(sock, buffer, 1024);
-        std::cout << "[Client] Got message: " << buffer << "\n";
-     
-        // closing the connected socket
-        close(client_fd);
-        return 0;
+            if(connect(s, (struct sockaddr *)&ipServidor, sizeof(ipServidor))<0)
+            {
+                std::cout << "\n" << "Error de conexión por IP o puerto" << "\n";
+                resultado= 2;
+            }
+            else
+            {
+                // Aca esta conectado, de fijo
+                std::string hello = "agregar " + std::to_string(random(2, 8));
+                send(s, hello.c_str(), hello.length(), 0);
+                
+                std::cout << "Mensaje: " << hello << "\n";
+                int valread = read(s, datos, 256);
+                std::cout << RESET << FAINT;
+                std::cout << "Datos en client:";
+                std::cout << RESET << BOLD;
+                std::cout << datos << "\n";
+            }
+        }
+      
+        return resultado;
     }
 };

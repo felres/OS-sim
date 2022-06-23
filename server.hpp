@@ -13,66 +13,113 @@
 
 class Server{
 private:
+    int suma = 0;
     int process(std::string str)
     {
         std::vector<std::string> vec  = tokenize(str, " ");
-        std::cout << "[Server] Got command: " << vec[0] << "\n";
+        if(vec.size() > 0)
+        {
+            if (vec[0] == "agregar")
+            {
+                if(vec.size() > 1)
+                {
+                    suma += stoi(vec[1]);
+                }
+                std::cout << "Added." << "\n";
+            }
+            else if (vec[0] == "GET")
+            {
+                std::cout << ".";
+            }
+        }
         return 0;
     }
 public:
     int run()
     {
-        int server_fd, new_socket, valread;
-        struct sockaddr_in address;
-        int opt = 1;
-        int addrlen = sizeof(address);
-        char buffer[1024] = { 0 };
-     
-        // Creating socket file descriptor
-        if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-            return err("socket failed", 1);
-     
-        // Forcefully attaching socket to the port 8080
-        if (setsockopt(server_fd, SOL_SOCKET,
-                       SO_REUSEADDR | SO_REUSEPORT, &opt,
-                       sizeof(opt)))
-            return err("setsockopt", 2);
+        /// "buffer"
+        char datos[256]; 
+        memset(datos, '\0', sizeof(datos));
+    
+        /// "server_fd"
+        /// File descriptor.
+        int socketServidor = 0;
         
-        address.sin_family = AF_INET;
-        address.sin_addr.s_addr = INADDR_ANY;
-        address.sin_port = htons(PORT);
-     
-        // Forcefully attaching socket to the port 8080
-        if (bind(server_fd,
-                (struct sockaddr*)&address, sizeof(address)) < 0)
-            return err("bind failed", 3);
-        
-        if (listen(server_fd, 3) < 0)
-            return err("listen", 4);
-        
-        if ((new_socket
-             = accept(server_fd, (struct sockaddr*)&address,
-                      (socklen_t*)&addrlen)) < 0)
-            return err("accept", 5);
-        
-        while(true)
-        {
-            valread = read(new_socket, buffer, 1024);
-            process(buffer);
-            
-            
-            /*
-            std::string str = "Hello from server.";
-            send(new_socket, str.c_str(), str.length(), 0);
-            std::cout << "[Server] Message sent." << "\n";
-            */
-        }
-        
-        // close connected socket
-        close(new_socket);
+        /// "new_socket"
+        int conexion = 0;
 
-        // close
-        shutdown(server_fd, SHUT_RDWR);
+        /// return value for checking
+        int val = 0;
+        
+        /// "address"
+        struct sockaddr_in ip;
+        memset(&ip, '0', sizeof(ip));
+        /// Fill info into ip
+        // The address family for the transport address.
+        // This member should always be set to AF_INET.
+    	ip.sin_family = AF_INET;
+    	// An IN_ADDR structure that contains an IPv4 transport address.
+        ip.sin_addr.s_addr = htonl(INADDR_ANY);
+    	// A transport protocol port number.
+        ip.sin_port = htons(1337);
+        
+    
+        // Create socket file descriptor
+        socketServidor = socket(AF_INET, SOCK_STREAM, 0);
+        if(socketServidor == 0) return err("Socket failed", 1);
+    
+        // bind socketServidor to the other args
+        val = bind(socketServidor, (struct sockaddr*)&ip , sizeof(ip));
+    	if(val < 0) return err("bind", 2);
+        
+        // Habilita socket para recibir conexiones
+        val = listen(socketServidor , 20);
+        if(val < 0) return err("listen", 3);
+     
+        int msjs = 0; sleep(1);
+        struct sockaddr_storage ipRemoto;
+        socklen_t l= sizeof(ipRemoto);
+        char strIpRemoto[INET6_ADDRSTRLEN];
+        int port;
+        std::cout << RESET << BOLD;
+        std::cout << "Server listening.";
+        std::cout << RESET;
+        while(msjs<5000)
+        {
+            conexion= accept(socketServidor, (struct sockaddr*) &ipRemoto, &l);
+            if (conexion < 0) return err("accept", 3);
+            
+            /// ???
+            struct sockaddr_in *s = (struct sockaddr_in *)&ipRemoto;
+            port = ntohs(s->sin_port);
+            inet_ntop(AF_INET, &s->sin_addr, strIpRemoto, sizeof strIpRemoto);
+            std::cout << "Remote IP: " << strIpRemoto << "\n" ;
+    
+            /*
+            read(conexion, datos, 256);
+            string msj="El servidor ha recibido "+ to_string(msjs) + " mensajes.";
+            msj.copy(datos,msj.size()+1) ;
+            write(conexion, datos, strlen(datos));*/
+            
+            
+            memset(datos, '\0', sizeof(datos));
+            int valread = read(conexion, datos, 256);
+            
+            process(datos);
+
+            /// response
+            std::string hello = "Suma: " + std::to_string(suma);
+            send(conexion, hello.c_str(), hello.length(), 0);
+
+            std::cout << "\n";
+            
+            close(conexion);
+            sleep(1);
+        
+        } //while
+        std::cout << RESET << BOLD;
+        std::cout << "Server closed.";
+        std::cout << RESET;
         return 0;
     }
 };
