@@ -9,10 +9,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "helpers.cpp"
-#define PORT 8080
 
 class Server{
 private:
+    FileSystem* fs;
+    Client* clientApp;
     int suma = 0;
     int process(std::string str)
     {
@@ -35,7 +36,12 @@ private:
         return 0;
     }
 public:
-    int run()
+    Server(FileSystem* filesys, Client* clientApp)
+    {
+        this->fs = filesys;
+        this->clientApp = clientApp;
+    };
+    int listen(int portNumber)
     {
         /// "buffer"
         char datos[256]; 
@@ -61,7 +67,7 @@ public:
     	// An IN_ADDR structure that contains an IPv4 transport address.
         ip.sin_addr.s_addr = htonl(INADDR_ANY);
     	// A transport protocol port number.
-        ip.sin_port = htons(1337);
+        ip.sin_port = htons(portNumber);
         
     
         // Create socket file descriptor

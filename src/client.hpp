@@ -8,12 +8,16 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "helpers.cpp"
-#define PORT 8080
 
 class Client{
 private:
+    FileSystem* fs;
 public:
-    int run()
+    Client(FileSystem* filesys)
+    {
+        this->fs = filesys;
+    };
+    int say(std::string msg, int portNumber)
     {
         randomize();
         int resultado = 0;
@@ -32,7 +36,7 @@ public:
         else
         {
             ipServidor.sin_family = AF_INET;
-            ipServidor.sin_port = htons(1337);
+            ipServidor.sin_port = htons(portNumber);
             ipServidor.sin_addr.s_addr = inet_addr("127.0.0.1");
      
             if(connect(s, (struct sockaddr *)&ipServidor, sizeof(ipServidor))<0)
@@ -43,10 +47,10 @@ public:
             else
             {
                 // Aca esta conectado, de fijo
-                std::string hello = "agregar " + std::to_string(random(2, 8));
-                send(s, hello.c_str(), hello.length(), 0);
+                //msg = "agregar " + std::to_string(random(2, 8));
+                send(s, msg.c_str(), msg.length(), 0);
                 
-                std::cout << "Mensaje: " << hello << "\n";
+                std::cout << "Mensaje: " << msg << "\n";
                 int valread = read(s, datos, 256);
                 std::cout << RESET << FAINT;
                 std::cout << "Datos en client:";

@@ -38,8 +38,8 @@ int main() {
     FileSystem *fs = new FileSystem();
     Padrone *padroneApp = new Padrone(fs);
     VotesReg *voteApp = new VotesReg(fs);
-    Server *serverApp = new Server();
-    Client *clientApp = new Client();
+    Client *clientApp = new Client(fs);
+    Server *serverApp = new Server(fs, clientApp);
     
 	Interface *console = new Interface(padroneApp,
                                     voteApp,

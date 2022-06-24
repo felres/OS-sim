@@ -231,10 +231,10 @@ public:
 	        {
                 if(argc > 1)
 	            {
-                    if( fs->canCurrentUserExecuteFile(argv[1]) )
+                    if( fs->canCurrentUserReadFile(argv[1]) )
                         padroneApp->run(argv[1]);
                     else
-                        std::cout << "No permission to execute " << argv[1] << ".\n";
+                        std::cout << "No permission to read " << argv[1] << ".\n";
                 }
                 else
 	                std::cout << "Use: padroneapp [file name]\n";
@@ -243,10 +243,10 @@ public:
 	        {
 	            if(argc > 1)
 	            {
-                    if( fs->canCurrentUserExecuteFile(argv[1]) )
+                    if( fs->canCurrentUserReadFile(argv[1]) )
                         voteApp->run(argv[1]);
                     else
-                        std::cout << "No permission to execute "
+                        std::cout << "No permission to read "
                                 << argv[1] << ".\n";
 	            }
 	            else
@@ -268,15 +268,27 @@ public:
 	        }
 	        else if(argv[0] == "test")
 	        {
-	            fs->loadTest();
+	            fs->loadTest(argv[0]);
+	            fs->loadTest(argv[0]);
 	        }
             else if(argv[0] == "server")
 	        {
-	            serverApp->run();
+				if (argc > 1)
+				{
+					serverApp->listen(stoi(argv[1]));
+				}
+				else
+					std::cout << "Use: server [port number]\n";
 	        }
             else if(argv[0] == "client")
 	        {
-	            clientApp->run();
+				if (argc > 2)
+				{
+					clientApp->say(argv[1], stoi(argv[2]));
+				}
+				else
+					std::cout << "Use: client [message] [port number]\n";
+				
 	        }
 	        // Final conditional
 	        else if(argv[0] != "")
