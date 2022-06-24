@@ -161,11 +161,14 @@ static int printWithUnderlineAt(std::string str,int i0 = -1,
 
 /**
  * Prints a normal string, but changing a specified char and coloring it
+ * Useful for printing special characters explicitly.
+ * Example: changing '\n' to '#'.
+ * printReplacing("hello", 'l', 'w') ptints "hewwo"
  * 
- * @param 
- * @param 
- * @param 
- * @return 
+ * @param str string to substitute on.
+ * @param ch char to substitute.
+ * @param ch char to replace
+ * @return 0
  */
 static int printReplacing(std::string str, char ch, char replacement)
 {
@@ -208,6 +211,10 @@ static std::vector<std::string> tokenize(std::string text, std::string delim)
     return words;
 }
 
+/**
+ * Writes (or overwrites) a string into a given filename
+ * 
+ */
 static int writeFile(std::string fileName, std::string str)
 {
     remove(fileName.c_str());
@@ -218,6 +225,10 @@ static int writeFile(std::string fileName, std::string str)
     return 0;
 }
 
+/**
+ * Reads a file and returns it (dividing by lines) into a vector.
+ *
+ */
 static std::vector<std::string> readFileToVector(std::string fileName)
 {
     std::vector<std::string> vec;
@@ -293,12 +304,12 @@ static void randomize()
 
 /**
  * Generates a random int in the range [min, max] (inclusive).
- * Lineal distribution.
+ * Linear distribution.
  * Sourced from: https://stackoverflow.com/q/7560114
  *
  * @param min minimum number to pick from inclusive.
  * @param max maximun number to pick from inclusive.
- * @return random int.
+ * @return random int in range.
  **/
 static int random(int min, int max)
 {
