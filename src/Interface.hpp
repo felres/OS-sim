@@ -10,18 +10,21 @@
 class Interface{
 private:
 	std::string input;
+	FileSystem* fs;
     Padrone *padroneApp;
     VotesReg *voteApp;
     Server *serverApp;
     Client *clientApp;
     
 public:
-	Interface(Padrone* padroneApp,
+	Interface(FileSystem* fs,
+				Padrone* padroneApp,
                 VotesReg* voteApp,
                 Server* serverApp,
                 Client* clientApp)
     {
-        this->padroneApp = padroneApp;
+		this->fs = fs;
+		this->padroneApp = padroneApp;
         this->voteApp = voteApp;
         this->serverApp = serverApp;
         this->clientApp = clientApp;
@@ -34,14 +37,14 @@ public:
      * @param FileSystem object to send user requests to.
      * @return 0 if ok.
      */	
-    int run(FileSystem* fs){
+    int run(){
 		while(true)
 	    {
 	        std::cout << RESET << BOLD << GREEN;
 	        std::cout << fs->getName() << ":~$ ";
 	        std::cout << RESET;
 	        std::getline(std::cin, input);
-	        if(process(input, fs)==1)
+	        if(process(input)==1)
 	            break;
 	    }
 		return 0;
@@ -56,7 +59,7 @@ public:
      * @param *fs file system to use.
      * @return 0 if can recieve more input. 1 if user requested exit.
      */
-	int process(std::string line, FileSystem *fs)
+	int process(std::string line)
 	{
 	    std::cout << RESET;
 	    

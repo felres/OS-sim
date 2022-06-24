@@ -14,32 +14,20 @@ class Server{
 private:
     FileSystem* fs;
     Client* clientApp;
+    Interface* console;
+    
     int suma = 0;
     int process(std::string str)
     {
-        std::vector<std::string> vec  = tokenize(str, " ");
-        if(vec.size() > 0)
-        {
-            if (vec[0] == "agregar")
-            {
-                if(vec.size() > 1)
-                {
-                    suma += stoi(vec[1]);
-                }
-                std::cout << "Added." << "\n";
-            }
-            else if (vec[0] == "GET")
-            {
-                std::cout << ".";
-            }
-        }
+        console->process(str);
         return 0;
     }
 public:
-    Server(FileSystem* filesys, Client* clientApp)
+    Server(FileSystem* filesys, Client* clientApp, Interface* console)
     {
         this->fs = filesys;
         this->clientApp = clientApp;
+        this->console = console;
     };
     int listen(int portNumber)
     {
