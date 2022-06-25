@@ -8,7 +8,7 @@
 #include <string>
 #include "FileSystem.hpp"
 #include "VotesReg.hpp"
-#include "helpers.cpp"
+#include "Helpers.cpp"
 
 int VotesReg::run(std::string filename)
 {

@@ -20,12 +20,12 @@
 
 #include <iostream>
 #include "FileSystem.hpp"
-#include "helpers.cpp"
+#include "Helpers.cpp"
 #include "Interface.hpp"
 #include "Padrone.hpp"
 #include "VotesReg.hpp"
-#include "client.hpp"
-#include "server.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 
 
@@ -45,6 +45,6 @@ int main() {
                                         voteApp,
                                         serverApp,
                                         clientApp);
-	serverApp->giveInterface(console);
+	//serverApp->giveInterface(console);
 	console->run();
 }

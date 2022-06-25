@@ -7,7 +7,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "helpers.cpp"
+#include "Helpers.cpp"
 
 class Client{
 private:
@@ -17,9 +17,15 @@ public:
     {
         this->fs = filesys;
     };
-    int say(std::string msg, int portNumber)
+    int say(int portNumber)
     {
-        randomize();
+        // first, request message to send through given port number
+        std::string msg;
+        std::cout << RESET << BOLD;
+        std::cout << "Message: ";
+        std::cout << RESET;
+        std::getline(std::cin, msg);
+        
         int resultado = 0;
         int s = 0;
         int n = 0;
@@ -50,11 +56,9 @@ public:
                 //msg = "agregar " + std::to_string(random(2, 8));
                 send(s, msg.c_str(), msg.length(), 0);
                 
-                std::cout << "Mensaje: " << msg << "\n";
+                std::cout << "Tu mensaje es: " << msg << "\n";
                 int valread = read(s, datos, 256);
-                std::cout << RESET << FAINT;
-                std::cout << "Datos en client:";
-                std::cout << RESET << BOLD;
+                std::cout << "Respuesta del servidor: ";
                 std::cout << datos << "\n";
             }
         }
