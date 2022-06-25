@@ -377,6 +377,7 @@ public:
      * @return
      */
     int loadTest();
+    int loadTestOld();
 
     int loadRealFile(std::string filename);
 

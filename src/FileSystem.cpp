@@ -384,14 +384,15 @@ void FileSystem::printFiles()
 void FileSystem::printUsers()
 {
     std::cout << RESET << BOLD;
-	std::cout << " Id|        Name|        Password(encrypted)| Primary Group" << "\n";
+	std::cout << " Id|        Name|        Password(encrypted)|   Primary Group" << "\n";
 	std::cout << RESET;
 	for(int i = 0; i < userCount; i++)
 	{
         std::cout << std::setw(3) << users[i].id << "|";
         std::cout << std::setw(12) << users[i].name << "|";
         std::cout << std::setw(27) << users[i].password << "|";
-        std::cout << std::setw(14)
+        std::cout << " ";
+        std::cout << std::setw(15)
             << getGroupNameAt(users[i].primaryGroupId);
         std::cout << "\n";
     }
@@ -402,24 +403,26 @@ void FileSystem::printUsers()
 void FileSystem::printGroups()
 {
     std::cout << RESET << BOLD;
-	std::cout << " Id|    Name| Users" << "\n";
+	std::cout << " Id|           Name| Users" << "\n";
 	std::cout << RESET;
 	for(int i = 0; i < groupCount; i++)
 	{
         std::cout << std::setw(3) << groups[i].id << "|";
-        std::cout << std::setw(8) << groups[i].name << "|";
+        std::cout << std::setw(15) << groups[i].name << "|";
         // primary members
         int arr[SIZE];
         int arrlen = getPrimaryMemberIdsInGroup(groups[i].id, arr);
+        std::cout << " ";
         for(int j = 0; j < arrlen; j++)
         {
-            std::cout << RESET << BOLD;
+            std::cout << RESET;
             std::cout << getUserNameWithId(arr[j]) << ", ";
             std::cout << RESET;
         }
         // secondary members
         for(int j = 0; j < groups[i].memberCount; j++)
         {
+            std::cout << RESET;
             std::cout << std::setw(3)
                 << getUserNameAt(groups[i].memberIdList[j]) << ", ";
         }
@@ -746,6 +749,24 @@ void FileSystem::imprimirUnidad(int cols)
 };
 
 int FileSystem::loadTest()
+{
+    // en teoria se ejecuta luego de agregar el root
+    createGroup("votingCenters");
+    createUserBypass("vc1", "votingCenters", "");
+    createUserBypass("vc2", "votingCenters", "");
+    createGroup("intermediaries");
+    createUserBypass("int1", "intermediaries", "");
+    createUserBypass("int2", "intermediaries", "");
+    createGroup("databases");
+    createUserBypass("db1", "databases", "");
+    createUserBypass("db2", "databases", "");
+    switchUser("db1");
+    // load votes.txt 
+    // load padrone.txt
+    return 0;
+};
+
+int FileSystem::loadTestOld()
 {
     // en teoria se ejecuta luego de agregar el root
     createGroup("students");
