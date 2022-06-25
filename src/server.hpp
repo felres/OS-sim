@@ -24,11 +24,16 @@ private:
         return 0;
     }
 public:
-    Server(FileSystem* filesys, Client* clientApp, Interface* console)
+    Server(FileSystem* filesys, Client* clientApp)
     {
         this->fs = filesys;
         this->clientApp = clientApp;
+        
+    };
+    int giveInterface(Interface* console)
+    {
         this->console = console;
+        return 0;
     };
     int listen(int portNumber)
     {
