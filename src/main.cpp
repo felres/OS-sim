@@ -24,8 +24,7 @@
 #include "Interface.hpp"
 #include "Padrone.hpp"
 #include "VotesReg.hpp"
-#include "Client.hpp"
-#include "Server.hpp"
+#include "Communicator.hpp"
 
 
 
@@ -38,13 +37,10 @@ int main() {
     FileSystem *fs = new FileSystem();
     Padrone *padroneApp = new Padrone(fs);
     VotesReg *voteApp = new VotesReg(fs);
-    Client* clientApp = new Client(fs);
-    Server* serverApp = new Server(fs, clientApp);
+    Communicator* comm = new Communicator(fs);
 	Interface *console = new Interface(fs,
                                         padroneApp,
                                         voteApp,
-                                        serverApp,
-                                        clientApp);
-	//serverApp->giveInterface(console);
+                                        comm);
 	console->run();
 }

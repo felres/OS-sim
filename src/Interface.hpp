@@ -4,8 +4,7 @@
 #include "FileSystem.hpp"
 #include "Padrone.hpp"
 #include "VotesReg.hpp"
-#include "Client.hpp"
-#include "Server.hpp"
+#include "Communicator.hpp"
 
 class Interface{
 private:
@@ -13,15 +12,13 @@ private:
 	FileSystem* fs;
     Padrone *padroneApp;
     VotesReg *voteApp;
-    Server *serverApp;
-    Client *clientApp;
+    Communicator *comm;
     
 public:
 	Interface(FileSystem* fs,
 				Padrone* padroneApp,
                 VotesReg* voteApp,
-                Server* serverApp,
-                Client* clientApp);
+                Communicator* comm);
 	~Interface();
 
     /**

@@ -5,14 +5,12 @@
 Interface::Interface(FileSystem* fs,
 			Padrone* padroneApp,
             VotesReg* voteApp,
-            Server* serverApp,
-            Client* clientApp)
+            Communicator* comm)
 {
 	this->fs = fs;
 	this->padroneApp = padroneApp;
     this->voteApp = voteApp;
-    this->serverApp = serverApp;
-    this->clientApp = clientApp;
+    this->comm = comm;
 }
 
 int Interface::run()
@@ -248,7 +246,7 @@ int Interface::process(std::string line)
 	    {
 			if (argc > 1)
 			{
-				serverApp->listenInPort(stoi(argv[1]));
+				comm->listen(stoi(argv[1]));
 			}
 			else
 				std::cout << "Use: server [port number]\n";
@@ -257,7 +255,7 @@ int Interface::process(std::string line)
 	    {
 			if (argc > 1)
 			{
-				clientApp->say(stoi(argv[1]));
+				comm->say(stoi(argv[1]));
 			}
 			else
 				std::cout << "Use: client [port number]\n";
