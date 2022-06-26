@@ -753,13 +753,13 @@ int FileSystem::loadTest()
     // en teoria se ejecuta luego de agregar el root
     createGroup("votingCenters");
     createUserBypass("vc1", "votingCenters", "");
-    createUserBypass("vc2", "votingCenters", "");
+    //createUserBypass("vc2", "votingCenters", "");
     createGroup("intermediaries");
     createUserBypass("int1", "intermediaries", "");
-    createUserBypass("int2", "intermediaries", "");
+    //createUserBypass("int2", "intermediaries", "");
     createGroup("databases");
     createUserBypass("db1", "databases", "");
-    createUserBypass("db2", "databases", "");
+    //createUserBypass("db2", "databases", "");
     switchUser("db1");
     // load votes.txt 
     // load padrone.txt

@@ -7,10 +7,23 @@
 #include "Server.hpp"
 
 
-std::string Server::process(std::string str)
+std::string Server::process(std::string line)
 {
-    //console->process(str);
-    return "I could not understand your message.";
+    std::vector<std::string> argv = tokenize(line, " ");
+	int argc = argv.size();
+	
+	if(argc > 0)
+	{
+		if(argv[0] == "ping")
+		{
+	    	return "pong";
+		}
+		else
+		{
+			return "Unknown message";
+		}
+	}
+    return "No message recieved";
 };
 
 Server::Server(FileSystem* filesys, Client* clientApp)

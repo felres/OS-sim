@@ -12,12 +12,12 @@
 #include "Client.hpp"
 //#include "Interface.hpp"
 
+
 class Server
 {
 private:
     FileSystem* fs;
     Client* clientApp;
-    //Interface* console;
     std::string process(std::string str);
     
 public:
