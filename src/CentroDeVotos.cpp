@@ -66,7 +66,7 @@ int CentroDeVotos::run(){
             case 0: std::cout << RED << "Please enter a valid input" << "\n" << RESET; break;
             case 1: optionIsAlive(); break;
             case 2: getInfoPerson(); break;
-            case 3: regsiterVote(); break;
+            case 3: registerVote(); break;
             case 4: registerVoterPerson(); break;
             case 5: cont = false; break;
         }
