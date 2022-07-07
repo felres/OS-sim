@@ -9,7 +9,7 @@
 #include "Helpers.cpp"
 #include "Server.hpp"
 #include "Client.hpp"
-
+#include "NodeParent.hpp"
 
 
 class Communicator
@@ -22,6 +22,6 @@ private:
     
 public:
 	Communicator(FileSystem *fs);
-    int say(int portNumber);
-    int listen(int portNumber);
+    int say(NodeParent *np, std::string msg);
+    int listen(NodeParent *np);
 };

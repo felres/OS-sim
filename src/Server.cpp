@@ -33,7 +33,7 @@ Server::Server(FileSystem* filesys, Client* clientApp)
     
 };
 
-int Server::listenInPort(int portNumber)
+int Server::listenInPort(int portNumber, NodeParent *np)
 {
     /// "buffer"
     char datos[256]; 
@@ -104,7 +104,7 @@ int Server::listenInPort(int portNumber)
         int valread = read(conexion, datos, 256);
         
         /// response
-        std::string myResponse = process(datos);
+        std::string myResponse = np->process(datos);
         send(conexion, myResponse.c_str(), myResponse.length(), 0);
 
 		std::cout << "Message recieved: " << datos << "\n";

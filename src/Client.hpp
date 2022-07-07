@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "Helpers.cpp"
+#include "NodeParent.hpp"
 
 class Client{
 private:
@@ -17,14 +18,17 @@ public:
     {
         this->fs = filesys;
     };
-    int say(int portNumber)
+    int say(int portNumber, NodeParent *np, std::string msg)
     {
         // first, request message to send through given port number
-        std::string msg;
-        std::cout << RESET << BOLD;
-        std::cout << "Message: ";
-        std::cout << RESET;
-        std::getline(std::cin, msg);
+        // opcional: si no se da msg, preguntar por consola
+        if(msg == "")
+        {
+            std::cout << RESET << BOLD;
+            std::cout << "Message: ";
+            std::cout << RESET;
+            std::getline(std::cin, msg);
+        }
         
         int resultado = 0;
         int s = 0;
@@ -55,6 +59,7 @@ public:
                 // Aca esta conectado, de fijo
                 //msg = "agregar " + std::to_string(random(2, 8));
                 send(s, msg.c_str(), msg.length(), 0);
+                np->process(datos);
                 
                 std::cout << "Tu mensaje es: " << msg << "\n";
                 int valread = read(s, datos, 256);

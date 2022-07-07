@@ -12,10 +12,7 @@
  * Documentation guide: https://developer.lsst.io/cpp/api-docs.html
  * 
  * To Do:
- * - Fix date
- * - Document code (IN ENGLISH)
- * - terminar transición de arrays a std::vectors
- * - distinguish between index and id
+ * - Add Protocols to respective process() https://docs.google.com/spreadsheets/d/1dI58FnXOyTGvsmeoWwhXEr6RcQyrihM0KbHcKZc9K40/edit?usp=sharing
  */
 
 #include <iostream>
@@ -37,10 +34,8 @@ int main() {
     FileSystem *fs = new FileSystem();
     Padrone *padroneApp = new Padrone(fs);
     VotesReg *voteApp = new VotesReg(fs);
-    Communicator* comm = new Communicator(fs);
 	Interface *console = new Interface(fs,
                                         padroneApp,
-                                        voteApp,
-                                        comm);
+                                        voteApp);
 	console->run();
 }

@@ -10,7 +10,7 @@
 #include "Helpers.cpp"
 #include "FileSystem.hpp"
 #include "Client.hpp"
-//#include "Interface.hpp"
+#include "NodeParent.hpp"
 
 
 class Server
@@ -22,5 +22,5 @@ private:
     
 public:
     Server(FileSystem* filesys, Client* clientApp);
-    int listenInPort(int portNumber);
+    int listenInPort(int portNumber,NodeParent *np);
 };

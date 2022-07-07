@@ -1,16 +1,17 @@
 #include "Interface.hpp"
 #include "Helpers.cpp"
+#include "BaseDeDatos.hpp"
+#include "CentroDeVotos.hpp"
+#include "Intermediario.hpp"
 
 
 Interface::Interface(FileSystem* fs,
 			Padrone* padroneApp,
-            VotesReg* voteApp,
-            Communicator* comm)
+            VotesReg* voteApp)
 {
 	this->fs = fs;
 	this->padroneApp = padroneApp;
     this->voteApp = voteApp;
-    this->comm = comm;
 }
 
 int Interface::run()
@@ -246,7 +247,7 @@ int Interface::process(std::string line)
 	    {
 			if (argc > 1)
 			{
-				comm->listen(stoi(argv[1]));
+				//comm->listen(stoi(argv[1]));
 			}
 			else
 				std::cout << "Use: server [port number]\n";
@@ -255,11 +256,26 @@ int Interface::process(std::string line)
 	    {
 			if (argc > 1)
 			{
-				comm->say(stoi(argv[1]));
+				//comm->say(stoi(argv[1]));
 			}
 			else
 				std::cout << "Use: client [port number]\n";
 			
+	    }
+        else if(argv[0] == "basededatos")
+	    {
+			BaseDeDatos* db = new BaseDeDatos();
+            db->run();
+	    }
+        else if(argv[0] == "intermediario")
+	    {
+			Intermediario* inte = new Intermediario();
+            inte->run();
+	    }
+        else if(argv[0] == "centrodevotos")
+	    {
+			CentroDeVotos* cv = new CentroDeVotos();
+            cv->run();
 	    }
 	    // Final conditional
 	    else if(argv[0] != "")

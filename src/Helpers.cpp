@@ -16,6 +16,8 @@
 
 /* MACROS */
 #define SIZE 256
+#define SHIFT 7
+
 
 /**
  * ANSI COLORS
@@ -47,9 +49,6 @@
 #define BACK_MAGENTA        "\u001b[45m"
 #define BACK_CYAN           "\u001b[46m"
 #define BACK_WHITE          "\u001b[47m"
-
-/* FUNCTIONS */
-
 
 static int printYesNo(bool v)
 {
