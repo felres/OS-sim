@@ -27,7 +27,7 @@ class Intermediario : public NodeParent{
   FileSystem* fs;
   Communicator* comm;
 	std::map<std::string, Instruccion> mapInstruccion;
-	void InitMap();
+	void initMap();
 public:
     Intermediario();
     int run();

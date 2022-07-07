@@ -11,7 +11,8 @@ Intermediario::Intermediario(){
   this->fs = new FileSystem();
   this->comm = new Communicator(fs);
   this->id = id;
-	this->mapaI
+	this->mapInstruccion = new std::map<std::string, Instruccion>;
+	initMap();
 }
 
 int Intermediario::run(){
@@ -88,12 +89,14 @@ std::string Intermediario::process(std::string msj){
 	
 	if(argc > 0)
 	{
-    switch(argv[0])
+    switch(mapInstruccion[argv[0]])
         {
             default:
-            case 0: std::cout << RED << "Please enter a valid input" << "\n" << RESET; break;
-            case "isAlive": optionIsAlive(); break;
-            case "registerVote": getInfoPerson(); break;
+            case Instruccion::isAlive: std::cout << RED << "Please enter a valid input" << "\n" << RESET; break;
+            case Instruccion::yesAlive: optionIsAlive(); break;
+            case Instruccion::
+							init
+							getInfoPerson(); break;
             case 3: regsiterVote(); break;
             case 4: registerVoterPerson(); break;
             case 5: cont = false; break;
@@ -111,13 +114,13 @@ std::string Intermediario::process(std::string msj){
 }
 
 void Intermediario::initMap(){
-	mapInstruccion[isAlive] = Instruccion::isAlive;
-	mapInstruccion[requestPerson] = Instruccion::requestPerson;
-	mapInstruccion[responsePerson] = Instruccion::responsePerson;
-	mapInstruccion[setVote] = Instruccion::setVote;
-	mapInstruccion[confirmVote] = Instruccion::confirmVote;
-	mapInstruccion[setPVoted] = Instruccion::setPVoted;
-	mapInstruccion[confirmPVoted] = Instruccion::confirmPVoted;
-	mapInstruccion[setMultVotes] = Instruccion::setMultVotes;
-	mapInstruccion[confirmMultVotes] = Instruccion::confirmMultVotes;
+	mapInstruccion["isAlive"] = Instruccion::isAlive;
+	mapInstruccion["requestPerson"] = Instruccion::requestPerson;
+	mapInstruccion["responsePerson"] = Instruccion::responsePerson;
+	mapInstruccion["setVote"] = Instruccion::setVote;
+	mapInstruccion["confirmVote"] = Instruccion::confirmVote;
+	mapInstruccion["setPVoted"] = Instruccion::setPVoted;
+	mapInstruccion["confirmPVoted"] = Instruccion::confirmPVoted;
+	mapInstruccion["setMultVotes"] = Instruccion::setMultVotes;
+	mapInstruccion["confirmMultVotes"] = Instruccion::confirmMultVotes;
 }
