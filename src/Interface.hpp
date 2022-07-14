@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include "Helpers.cpp"
+#include "BaseDeDatos.hpp"
+#include "CentroDeVotos.hpp"
+#include "Intermediario.hpp"
 #include "FileSystem.hpp"
 #include "Padrone.hpp"
 #include "VotesReg.hpp"
@@ -9,8 +13,8 @@ class Interface{
 private:
 	std::string input;
 	FileSystem* fs;
-    Padrone *padroneApp;
-    VotesReg *voteApp;
+  Padrone *padroneApp;
+  VotesReg *voteApp;
     
 public:
 	Interface(FileSystem* fs,

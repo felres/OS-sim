@@ -1,12 +1,4 @@
-
-
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
 #include "CentroDeVotos.hpp"
-#include "NodeParent.hpp"
-
 
 int CentroDeVotos::run(){
 
@@ -65,9 +57,20 @@ int CentroDeVotos::run(){
             default:
             case 0: std::cout << RED << "Please enter a valid input" << "\n" << RESET; break;
             case 1: optionIsAlive(); break;
-            case 2: getInfoPerson(); break;
-            case 3: registerVote(); break;
-            case 4: registerVoterPerson(); break;
+            case 2: 
+                    std::cout << "Ingrese la cédula a consultar:" << "\n";
+                    std::getline(std::cin, input);
+                    getInfoPerson(input); 
+                    break;
+            case 3: std::cout << "Ingrese el número de candidato:" << "\n";
+                    std::getline(std::cin, input);
+                    registerVote(input); 
+                    break;
+            case 4: 
+                    std::cout << "Ingrese la cédula del votante:" << "\n";
+                    std::getline(std::cin, input);
+                    registerVoterPerson(input); 
+                    break;
             case 5: cont = false; break;
         }
 	}
@@ -83,26 +86,27 @@ CentroDeVotos::CentroDeVotos(){
   this->comm = new Communicator(fs);
 }
 
-int CentroDeVotos::optionIsAlive()
-{
-    comm->say(this, "isAlive");
-    return 0;
+int CentroDeVotos::optionIsAlive( ){
+std::string answer;
+this->comm->say(this, "isAlive", answer);
+std::cout << "answer form centro de votos: " << answer << std::endl;
+return 0;
 }
 
-int CentroDeVotos::getInfoPerson(std::string id, )
-{
-  comm->say(this, "isAlive");
-    return 0;
+int CentroDeVotos::getInfoPerson(std::string id){
+  std::string answer;
+  this->comm->say(this, "requestPerson," + id, answer);
+  return 0;
 }
 
-int CentroDeVotos::registerVote()
-{
-  comm->say(this, "isAlive");
-    return 0;
+int CentroDeVotos::registerVote(std::string candidate){
+  std::string answer;
+  this->comm->say(this, "setVote," + candidate, answer);
+  return 0;
 }
 
-int CentroDeVotos::registerVoterPerson()
-{
-  comm->say(this, "isAlive");
-    return 0;
+int CentroDeVotos::registerVoterPerson(std::string id){
+  std::string answer;
+  this->comm->say(this, "setPVoted," + id, answer);
+  return 0;
 }

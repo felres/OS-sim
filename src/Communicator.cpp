@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
 #include "Communicator.hpp"
-
 
 #define DEF_NUM 6000
 
@@ -14,9 +9,9 @@ Communicator::Communicator(FileSystem *fs)
     this->serverApp = new Server(fs, clientApp);
 }
 
-int Communicator::say(NodeParent *np, std::string msg)
+int Communicator::say(NodeParent *np, std::string msg, std::string & ans)
 {
-    return clientApp->say(DEF_NUM, np, msg);
+    return clientApp->say(DEF_NUM, np, msg, ans);
 };
 
 int Communicator::listen(NodeParent *np)

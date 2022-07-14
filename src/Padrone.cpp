@@ -1,15 +1,4 @@
-#include <algorithm>
-#include <ctype.h>
-#include <fstream>
-#include <ios>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
-#include <vector>
 #include "Padrone.hpp"
-#include "Helpers.cpp"
 
 int Padrone::run(std::string filename)
 {
@@ -172,13 +161,38 @@ int Padrone::processPersonCheck()
     return 0;
 };
 
-int Padrone::processSetVotingStatus()
+std::string Padrone::dbPersonCheck(std::string person)
+{
+    if(padroneFileIndex==-1) return "No padrone file opened.";
+    
+    if(!doesPersonExist(person))
+        return "Person ID " + person + " does not exist.";
+    
+    std::vector<std::string> personInfo = getPersonColumn(person);
+    std::string answer = "Id: ";
+    answer += personInfo[0] + ",";
+    answer += "Name: ";
+    answer += personInfo[1] + ",";
+    answer += "Voting classroom: ";
+    answer += personInfo[2] + ",";
+    answer += "Voting information: ";
+    if(hasPersonVoted(person))
+        answer += "This person already voted.";
+    else
+        answer += "This person has not yet voted.";
+    return answer;
+};
+
+int Padrone::processSetVotingStatus(std::string person)
 {
     if(padroneFileIndex==-1) return err("No padrone file opened.", 1);
-    std::cout << "Id of person to set voting status to TRUE: ";
     std::string input;
-    std::getline(std::cin, input);
-
+    if(person.empty()){
+      std::cout << "Id of person to set voting status to TRUE: ";
+      std::getline(std::cin, input);
+    }else{
+      input = person;
+    }
     
     if(!doesPersonExist(input))
         return err("Person ID "+input+" does not exist.", 2);

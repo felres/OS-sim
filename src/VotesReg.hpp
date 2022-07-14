@@ -1,6 +1,14 @@
 #pragma once
 
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <string>
+#include "Helpers.cpp"
 #include "FileSystem.hpp"
 
 class VotesReg {
@@ -14,7 +22,7 @@ public:
             fs=filesys;
     };
 
-    int processRegisterNewVote();
+    int processRegisterNewVote(std::string vote = std::string());
     int processSaveVoteRegIntoReal();
     int run(std::string filename);
     int openVotesReg(std::string filename);

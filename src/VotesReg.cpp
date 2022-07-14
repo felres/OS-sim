@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <string>
-#include "FileSystem.hpp"
 #include "VotesReg.hpp"
-#include "Helpers.cpp"
 
 int VotesReg::run(std::string filename)
 {
@@ -120,17 +110,22 @@ int VotesReg::processCountAndPrintVotes()
     return 0;
 };
 
-int VotesReg::processRegisterNewVote()
-{
+int VotesReg::processRegisterNewVote(std::string vote){
     std::string input, sfinal;
-    std::cout << RESET << BOLD << BLUE;
-    std::cout << "- You can input any string as a valid vote." << "\n";
-    std::cout << "- An empty input will cast a vote as EN BLANCO." << "\n";
-    std::cout << "- An incorrect input will cast a vote as NULO." << "\n";
-    std::cout << RESET;
-    std::cout << "Enter the vote choice: ";
-    std::getline(std::cin, input);
-    if(input == "")
+    if(vote.empty()){
+      std::cout << RESET << BOLD << BLUE;
+      std::cout << "- You can input any string as a valid vote." << "\n";
+      std::cout << "- An empty input will cast a vote as EN BLANCO." << "\n";
+      std::cout << "- An incorrect input will cast a vote as NULO." << "\n";
+      std::cout << RESET;
+      std::cout << "Enter the vote choice: ";
+      std::getline(std::cin, input);
+      }
+    else{
+      input = vote;
+    }
+    
+    if(input.empty())
     {
         sfinal = "0"; //en blanco
     }

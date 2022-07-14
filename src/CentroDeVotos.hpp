@@ -1,4 +1,5 @@
 #pragma once
+
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,8 +23,7 @@ class CentroDeVotos : public NodeParent{
   int run();
   std::string process(std::string msj);
   int optionIsAlive();
-  int getInfoPerson();
-  int registerVote();
-  int registerVoterPerson();
-
+  int getInfoPerson(std::string id);
+  int registerVote(std::string candidate);
+  int registerVoterPerson(std::string id);
 };

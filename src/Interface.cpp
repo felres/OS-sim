@@ -1,9 +1,4 @@
 #include "Interface.hpp"
-#include "Helpers.cpp"
-#include "BaseDeDatos.hpp"
-#include "CentroDeVotos.hpp"
-#include "Intermediario.hpp"
-
 
 Interface::Interface(FileSystem* fs,
 			Padrone* padroneApp,
@@ -76,10 +71,13 @@ int Interface::process(std::string line)
 	        std::cout << RESET << BOLD;
 		    std::cout << "      (DEBUG ONLY)" << "\n";
 	        std::cout << RESET;
-	        std::cout << "       print| print full memory unit" << "\n";
-	        std::cout << "        test| add template users, groups and files" << "\n";
-            std::cout << "      server| " << "\n";
-            std::cout << "      client| " << "\n";
+	        std::cout << "        print| print full memory unit" << "\n";
+	        std::cout << "         test| add template users, groups and files" << "\n";
+            std::cout << "       server| " << "\n";
+            std::cout << "       client| " << "\n";
+            std::cout << "centrodevotos| " << "\n";
+            std::cout << "intermediario| " << "\n";
+            std::cout << "  basededatos| " << "\n";
 	        std::cout << "\n";
 	    }
 	    else if((argv[0] == "filelist")||(argv[0] == "fl")||(argv[0] == "ls"))
@@ -264,7 +262,7 @@ int Interface::process(std::string line)
 	    }
         else if(argv[0] == "basededatos")
 	    {
-			BaseDeDatos* db = new BaseDeDatos();
+			BaseDeDatos* db = new BaseDeDatos(fs, padroneApp, voteApp);
             db->run();
 	    }
         else if(argv[0] == "intermediario")

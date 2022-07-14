@@ -1,8 +1,17 @@
 #pragma once
 
-
+#include <algorithm>
+#include <ctype.h>
+#include <fstream>
+#include <ios>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <string>
+#include <vector>
 #include "FileSystem.hpp"
+#include "Helpers.cpp"
 
 class Padrone {
 private: 
@@ -17,7 +26,6 @@ private:
     int processLoadRealPadrone();
     int processPrintFullPadrone();
     int processPersonCheck();
-    int processSetVotingStatus();
     std::string getPadroneFileName();
     std::vector<std::string> getPersonColumn(std::string id);
 
@@ -32,7 +40,11 @@ public:
     };
 
     int processAddPerson();
+        
+    std::string dbPersonCheck(std::string person);
     
+    int processSetVotingStatus(std::string person = std::string());
+
     int processSavePadroneFileIntoRealFile();
 
     int openPadrone(std::string filename);
