@@ -22,6 +22,6 @@ private:
     
 public:
 	Communicator(FileSystem *fs);
-    int say(NodeParent *np, std::string msg, std::string & ans);
+    int say(NodeParent *np, std::string msg, std::string & ans, std::string address);
     int listen(NodeParent *np);
 };

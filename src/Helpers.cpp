@@ -15,7 +15,7 @@
 #include <ios>
 
 /* MACROS */
-#define SIZE 256
+#define SIZE 1024
 #define SHIFT 7
 
 

@@ -9,9 +9,9 @@ Communicator::Communicator(FileSystem *fs)
     this->serverApp = new Server(fs, clientApp);
 }
 
-int Communicator::say(NodeParent *np, std::string msg, std::string & ans)
+int Communicator::say(NodeParent *np, std::string msg, std::string & ans, std::string address)
 {
-    return clientApp->say(DEF_NUM, np, msg, ans);
+    return clientApp->say(DEF_NUM, np, msg, ans, address);
 };
 
 int Communicator::listen(NodeParent *np)

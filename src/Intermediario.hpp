@@ -29,6 +29,7 @@ class Intermediario : public NodeParent{
   int port = 6000;
   std::vector<int> validOutputs;
   FileSystem* fs;
+  std::string destAddress;
   Communicator* comm;
 	std::map<std::string, Instruccion> mapInstruccion;
 	void initMap();

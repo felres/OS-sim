@@ -18,7 +18,7 @@ public:
     {
         this->fs = filesys;
     };
-    int say(int portNumber, NodeParent *np, std::string msg, std::string & ans)
+    int say(int portNumber, NodeParent *np, std::string msg, std::string & ans, std::string address)
     {
         // first, request message to send through given port number
         // opcional: si no se da msg, preguntar por consola
@@ -44,7 +44,7 @@ public:
         else {
           ipServidor.sin_family = AF_INET;
           ipServidor.sin_port = htons(portNumber);
-          ipServidor.sin_addr.s_addr = inet_addr("127.0.0.1");
+          ipServidor.sin_addr.s_addr = inet_addr(address.c_str());
    
           if(connect(s, (struct sockaddr *)&ipServidor, sizeof(ipServidor))<0)
           {

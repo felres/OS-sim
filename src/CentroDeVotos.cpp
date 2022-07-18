@@ -14,7 +14,15 @@ int CentroDeVotos::run(){
             id = stoi(input);
         else
             return err("No valid id.", 1);
+            
+        /// temporal para cambiar el ip al que manda mensaje
+        std::cout << RESET << BOLD;
+	    std::cout << "destAddress: ";
+	    std::cout << RESET;
+	    std::getline(std::cin, input);
+        destAddress = input;
 
+        /*
         std::cout << RESET << BOLD;
         std::cout << "Please type all neighbor ids. Type a non-number to stop (ex. \"stop\")." << "\n";
         std::cout << RESET;
@@ -33,7 +41,8 @@ int CentroDeVotos::run(){
             {
                 cont = false;
             }
-        }
+        }//while
+        */
     } //cierra if
     
     bool cont = true;
@@ -88,25 +97,25 @@ CentroDeVotos::CentroDeVotos(){
 
 int CentroDeVotos::optionIsAlive( ){
 std::string answer;
-this->comm->say(this, "isAlive", answer);
+this->comm->say(this, "isAlive", answer, destAddress);
 std::cout << "answer form centro de votos: " << answer << std::endl;
 return 0;
 }
 
 int CentroDeVotos::getInfoPerson(std::string id){
   std::string answer;
-  this->comm->say(this, "requestPerson," + id, answer);
+  this->comm->say(this, "requestPerson," + id, answer, destAddress);
   return 0;
 }
 
 int CentroDeVotos::registerVote(std::string candidate){
   std::string answer;
-  this->comm->say(this, "setVote," + candidate, answer);
+  this->comm->say(this, "setVote," + candidate, answer, destAddress);
   return 0;
 }
 
 int CentroDeVotos::registerVoterPerson(std::string id){
   std::string answer;
-  this->comm->say(this, "setPVoted," + id, answer);
+  this->comm->say(this, "setPVoted," + id, answer, destAddress);
   return 0;
 }

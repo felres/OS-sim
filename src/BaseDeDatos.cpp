@@ -5,7 +5,7 @@ BaseDeDatos::BaseDeDatos(FileSystem* fs,
                          VotesReg* voteApp){
   this->comm = new Communicator(fs);
   this->fs = fs;
-	this->padroneApp = padroneApp;
+  this->padroneApp = padroneApp;
   this->voteApp = voteApp;
   this->fs->loadRealFile("database/votes.txt");
   this->fs->loadRealFile("database/padrone.txt");
@@ -94,7 +94,8 @@ int BaseDeDatos::run(){
             id = stoi(input);
         else
             return err("No valid id.", 1);
-
+		
+		/*
         std::cout << RESET << BOLD;
         std::cout << "Please type all neighbor ids. Type a non-number to stop (ex. \"stop\")." << "\n";
         std::cout << RESET;
@@ -113,7 +114,7 @@ int BaseDeDatos::run(){
             {
                 cont = false;
             }
-        }
+        }*/
     } //cierra if
     
     bool cont = true;

@@ -21,6 +21,14 @@ int Intermediario::run(){
       id = stoi(input);
     else
       return err("No valid id.", 1);
+      
+    /// temporal para cambiar el ip al que manda mensaje
+    std::cout << RESET << BOLD;
+	std::cout << "destAddress: ";
+	std::cout << RESET;
+	std::getline(std::cin, input);
+    destAddress = input;
+    /*
     std::cout << RESET << BOLD;
     std::cout << "Please type all neighbor ids. Type a non-number to stop (ex. \"stop\")." << "\n";
     std::cout << RESET;
@@ -35,7 +43,8 @@ int Intermediario::run(){
       } else {
         cont = false;
       }
-    }
+    }//while
+    */
   } //cierra if
     
   bool cont = true;
@@ -83,25 +92,25 @@ std::string Intermediario::process(std::string msj){
       case Instruccion::yesAlive:
         break;
       case Instruccion::requestPerson:
-        this->comm->say(this, argv[1], answer);
+        this->comm->say(this, argv[1], answer, destAddress);
         response = answer;
         break;
       case Instruccion::responsePerson:
         break;
       case Instruccion::setVote:
-        this->comm->say(this, argv[1], answer);
+        this->comm->say(this, argv[1], answer, destAddress);
         response = answer;
         break;
       case Instruccion::confirmVote:
         break;
       case Instruccion::setPVoted:
-        this->comm->say(this, argv[1], answer);
+        this->comm->say(this, argv[1], answer, destAddress);
         response = answer;
         break;
       case Instruccion::confirmPVoted:
         break;
       case Instruccion::setMultVotes:
-        this->comm->say(this, msj, answer);
+        this->comm->say(this, msj, answer, destAddress);
         response = answer;
         break;
       case Instruccion::confirmMultVotes:
@@ -115,23 +124,23 @@ std::string Intermediario::process(std::string msj){
 
 int Intermediario::storageIsAlive(){
   std::string answer;
-  this->comm->say(this, "isAlive", answer);
+  this->comm->say(this, "isAlive", answer, destAddress);
   return 0;
 }
 
 std::string Intermediario::getInfoPerson(std::string msj){
   std::string answer;
-  this->comm->say(this, msj, answer);
+  this->comm->say(this, msj, answer, destAddress);
   return answer;
 }
 std::string Intermediario::saveVote(std::string msj){
   std::string answer;
-  this->comm->say(this, msj, answer);
+  this->comm->say(this, msj, answer, destAddress);
   return "datos";
 }
 std::string Intermediario::saveVoterPerson(std::string msj){
   std::string answer;
-  this->comm->say(this, msj, answer);
+  this->comm->say(this, msj, answer, destAddress);
   return "datos";
 }
 

@@ -16,6 +16,7 @@ class CentroDeVotos : public NodeParent{
   int id = -1;
   int port = 6000;
   std::vector<int> validOutputs;
+  std::string destAddress;
   FileSystem* fs;
   Communicator* comm;
   public:
