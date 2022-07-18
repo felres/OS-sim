@@ -92,19 +92,19 @@ std::string Intermediario::process(std::string msj){
       case Instruccion::yesAlive:
         break;
       case Instruccion::requestPerson:
-        this->comm->say(this, argv[1], answer, destAddress);
+        this->comm->say(this, msj, answer, destAddress);
         response = answer;
         break;
       case Instruccion::responsePerson:
         break;
       case Instruccion::setVote:
-        this->comm->say(this, argv[1], answer, destAddress);
+        this->comm->say(this, msj, answer, destAddress);
         response = answer;
         break;
       case Instruccion::confirmVote:
         break;
       case Instruccion::setPVoted:
-        this->comm->say(this, argv[1], answer, destAddress);
+        this->comm->say(this, msj, answer, destAddress);
         response = answer;
         break;
       case Instruccion::confirmPVoted:
